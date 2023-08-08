@@ -3,7 +3,5 @@
     public enum ChatFormat
     {
         Json,
-        Text,
-        Html
     }
 }

@@ -229,7 +229,7 @@ namespace TwitchDownloaderCore.Tools
             }
 
             subMessageComment.message.fragments.RemoveRange(1, comment.message.fragments.Count - 1);
-            subMessageComment.message.emoticons.Clear();
+            // subMessageComment.message.emoticons.Clear();
 
             // Check to see if there is a custom message before the next fragment
             // i.e. Foobar subscribed with Prime. They've subscribed for 45 months! Hey PogChamp

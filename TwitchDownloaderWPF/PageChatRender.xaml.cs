@@ -69,39 +69,30 @@ namespace TwitchDownloaderWPF
             if (isRendering)
             {
                 SplitBtnRender.Visibility = Visibility.Collapsed;
-                BtnEnqueue.Visibility = Visibility.Collapsed;
                 BtnCancel.Visibility = Visibility.Visible;
                 return;
             }
             if (FileNames.Length > 1)
             {
                 SplitBtnRender.Visibility = Visibility.Collapsed;
-                BtnEnqueue.Visibility = Visibility.Visible;
                 BtnCancel.Visibility = Visibility.Collapsed;
                 return;
             }
             SplitBtnRender.Visibility = Visibility.Visible;
-            BtnEnqueue.Visibility = Visibility.Collapsed;
             BtnCancel.Visibility = Visibility.Collapsed;
         }
 
         public ChatRenderOptions GetOptions(string filename)
         {
             SKColor backgroundColor = new(colorBackground.SelectedColor.Value.R, colorBackground.SelectedColor.Value.G, colorBackground.SelectedColor.Value.B, colorBackground.SelectedColor.Value.A);
-            SKColor altBackgroundColor = new(colorAlternateBackground.SelectedColor.Value.R, colorAlternateBackground.SelectedColor.Value.G, colorAlternateBackground.SelectedColor.Value.B, colorAlternateBackground.SelectedColor.Value.A);
             SKColor messageColor = new(colorFont.SelectedColor.Value.R, colorFont.SelectedColor.Value.G, colorFont.SelectedColor.Value.B);
             ChatRenderOptions options = new()
             {
                 OutputFile = filename,
                 InputFile = textJson.Text,
                 BackgroundColor = backgroundColor,
-                AlternateBackgroundColor = altBackgroundColor,
-                AlternateMessageBackgrounds = (bool)checkAlternateMessageBackgrounds.IsChecked,
                 ChatHeight = int.Parse(textHeight.Text),
                 ChatWidth = int.Parse(textWidth.Text),
-                BttvEmotes = (bool)checkBTTV.IsChecked,
-                FfzEmotes = (bool)checkFFZ.IsChecked,
-                StvEmotes = (bool)checkSTV.IsChecked,
                 Outline = (bool)checkOutline.IsChecked,
                 Font = (string)comboFont.SelectedItem,
                 FontSize = numFontSize.Value,
@@ -125,16 +116,17 @@ namespace TwitchDownloaderWPF
                 OutputArgs = textFfmpegOutput.Text,
                 MessageFontStyle = SKFontStyle.Normal,
                 UsernameFontStyle = SKFontStyle.Bold,
+                Offline = true,
                 GenerateMask = (bool)checkMask.IsChecked,
-                OutlineSize = 4 * double.Parse(textOutlineScale.Text, CultureInfo.CurrentCulture),
+                OutlineSize = 2.4,
                 FfmpegPath = "ffmpeg",
                 TempFolder = Settings.Default.TempPath,
-                SubMessages = (bool)checkSub.IsChecked,
-                ChatBadges = (bool)checkBadge.IsChecked,
-                Offline = (bool)checkOffline.IsChecked,
                 AllowUnlistedEmotes = true,
                 DisperseCommentOffsets = (bool)checkDispersion.IsChecked,
-                LogFfmpegOutput = true
+                LogFfmpegOutput = true,
+                BttvEmotes = true,
+                StvEmotes = true,
+                FfzEmotes = true,
             };
             if (RadioEmojiNotoColor.IsChecked == true)
                 options.EmojiVendor = EmojiVendor.GoogleNotoColor;
@@ -142,10 +134,6 @@ namespace TwitchDownloaderWPF
                 options.EmojiVendor = EmojiVendor.TwitterTwemoji;
             else if (RadioEmojiNone.IsChecked == true)
                 options.EmojiVendor = EmojiVendor.None;
-            foreach (var item in comboBadges.SelectedItems)
-            {
-                options.ChatBadgeMask += (int)((ChatBadgeListItem)item).Type;
-            }
 
             return options;
         }
@@ -177,10 +165,6 @@ namespace TwitchDownloaderWPF
                 checkOutline.IsChecked = Settings.Default.Outline;
                 checkTimestamp.IsChecked = Settings.Default.Timestamp;
                 colorBackground.SelectedColor = System.Windows.Media.Color.FromArgb(Settings.Default.BackgroundColorA, Settings.Default.BackgroundColorR, Settings.Default.BackgroundColorG, Settings.Default.BackgroundColorB);
-                colorAlternateBackground.SelectedColor = System.Windows.Media.Color.FromArgb(Settings.Default.AlternateBackgroundColorA, Settings.Default.AlternateBackgroundColorR, Settings.Default.AlternateBackgroundColorG, Settings.Default.AlternateBackgroundColorB);
-                checkFFZ.IsChecked = Settings.Default.FFZEmotes;
-                checkBTTV.IsChecked = Settings.Default.BTTVEmotes;
-                checkSTV.IsChecked = Settings.Default.STVEmotes;
                 textHeight.Text = Settings.Default.Height.ToString();
                 textWidth.Text = Settings.Default.Width.ToString();
                 numFontSize.Value = Settings.Default.FontSize;
@@ -189,8 +173,6 @@ namespace TwitchDownloaderWPF
                 textFramerate.Text = Settings.Default.Framerate.ToString();
                 checkMask.IsChecked = Settings.Default.GenerateMask;
                 CheckRenderSharpening.IsChecked = Settings.Default.ChatRenderSharpening;
-                checkSub.IsChecked = Settings.Default.SubMessages;
-                checkBadge.IsChecked = Settings.Default.ChatBadges;
                 textEmoteScale.Text = Settings.Default.EmoteScale.ToString("0.0#");
                 textEmojiScale.Text = Settings.Default.EmojiScale.ToString("0.0#");
                 textBadgeScale.Text = Settings.Default.BadgeScale.ToString("0.0#");
@@ -204,27 +186,10 @@ namespace TwitchDownloaderWPF
                 textOutlineScale.Text = Settings.Default.OutlineScale.ToString("0.0#");
                 textIgnoreUsersList.Text = Settings.Default.IgnoreUsersList;
                 textBannedWordsList.Text = Settings.Default.BannedWordsList;
-                checkOffline.IsChecked = Settings.Default.Offline;
                 checkDispersion.IsChecked = Settings.Default.DisperseCommentOffsets;
-                checkAlternateMessageBackgrounds.IsChecked = Settings.Default.AlternateMessageBackgrounds;
                 RadioEmojiNotoColor.IsChecked = (EmojiVendor)Settings.Default.RenderEmojiVendor == EmojiVendor.GoogleNotoColor;
                 RadioEmojiTwemoji.IsChecked = (EmojiVendor)Settings.Default.RenderEmojiVendor == EmojiVendor.TwitterTwemoji;
                 RadioEmojiNone.IsChecked = (EmojiVendor)Settings.Default.RenderEmojiVendor == EmojiVendor.None;
-
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.Broadcaster, Name = "Broadcaster" });
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.Moderator, Name = "Mods" });
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.VIP, Name = "VIPs" });
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.Subscriber, Name = "Subs" });
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.Predictions, Name = "Predictions" });
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.NoAudioVisual, Name = "No Audio/No Video" });
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.PrimeGaming, Name = "Prime" });
-                comboBadges.Items.Add(new ChatBadgeListItem() { Type = ChatBadgeType.Other, Name = "Others" });
-
-                foreach (ChatBadgeListItem item in comboBadges.Items)
-                {
-                    if (((ChatBadgeType)Settings.Default.ChatBadgeMask).HasFlag(item.Type))
-                        comboBadges.SelectedItems.Add(item);
-                }
 
                 foreach (VideoContainer container in comboFormat.Items)
                 {
@@ -293,23 +258,12 @@ namespace TwitchDownloaderWPF
             Settings.Default.BackgroundColorG = colorBackground.SelectedColor.Value.G;
             Settings.Default.BackgroundColorB = colorBackground.SelectedColor.Value.B;
             Settings.Default.BackgroundColorA = colorBackground.SelectedColor.Value.A;
-            Settings.Default.AlternateBackgroundColorR = colorAlternateBackground.SelectedColor.Value.R;
-            Settings.Default.AlternateBackgroundColorG = colorAlternateBackground.SelectedColor.Value.G;
-            Settings.Default.AlternateBackgroundColorB = colorAlternateBackground.SelectedColor.Value.B;
-            Settings.Default.AlternateBackgroundColorA = colorAlternateBackground.SelectedColor.Value.A;
-            Settings.Default.FFZEmotes = (bool)checkFFZ.IsChecked;
-            Settings.Default.BTTVEmotes = (bool)checkBTTV.IsChecked;
-            Settings.Default.STVEmotes = (bool)checkSTV.IsChecked;
             Settings.Default.FontColorR = colorFont.SelectedColor.Value.R;
             Settings.Default.FontColorG = colorFont.SelectedColor.Value.G;
             Settings.Default.FontColorB = colorFont.SelectedColor.Value.B;
             Settings.Default.GenerateMask = (bool)checkMask.IsChecked;
             Settings.Default.ChatRenderSharpening = (bool)CheckRenderSharpening.IsChecked;
-            Settings.Default.SubMessages = (bool)checkSub.IsChecked;
-            Settings.Default.ChatBadges = (bool)checkBadge.IsChecked;
-            Settings.Default.Offline = (bool)checkOffline.IsChecked;
             Settings.Default.DisperseCommentOffsets = (bool)checkDispersion.IsChecked;
-            Settings.Default.AlternateMessageBackgrounds = (bool)checkAlternateMessageBackgrounds.IsChecked;
             if (comboFormat.SelectedItem != null)
             {
                 Settings.Default.VideoContainer = ((VideoContainer)comboFormat.SelectedItem).Name;
@@ -328,12 +282,6 @@ namespace TwitchDownloaderWPF
                 Settings.Default.RenderEmojiVendor = (int)EmojiVendor.TwitterTwemoji;
             else if (RadioEmojiNone.IsChecked == true)
                 Settings.Default.RenderEmojiVendor = (int)EmojiVendor.None;
-            int newMask = 0;
-            foreach (var item in comboBadges.SelectedItems)
-            {
-                newMask += (int)((ChatBadgeListItem)item).Type;
-            }
-            Settings.Default.ChatBadgeMask = newMask;
 
             try
             {
@@ -398,7 +346,7 @@ namespace TwitchDownloaderWPF
                 return false;
             }
 
-            if (checkMask.IsChecked == false && (colorBackground.SelectedColor!.Value.A < 255 || ((bool)checkAlternateMessageBackgrounds.IsChecked! && colorAlternateBackground.SelectedColor!.Value.A < 255)))
+            if (checkMask.IsChecked == false && (colorBackground.SelectedColor!.Value.A < 255))
             {
                 if (((VideoContainer)comboFormat.SelectedItem).Name is not "MOV" and not "WEBM" ||
                     ((Codec)comboCodec.SelectedItem).Name is not "RLE" and not "ProRes" and not "VP8" and not "VP9")
@@ -408,7 +356,7 @@ namespace TwitchDownloaderWPF
                 }
             }
 
-            if (checkMask.IsChecked == true && colorBackground.SelectedColor!.Value.A == 255 && !((bool)checkAlternateMessageBackgrounds.IsChecked! && colorAlternateBackground.SelectedColor!.Value.A != 255))
+            if (checkMask.IsChecked == true && colorBackground.SelectedColor!.Value.A == 255)
             {
                 AppendLog(Translations.Strings.ErrorLog + Translations.Strings.MaskWithNoAlpha);
                 return false;
@@ -460,7 +408,7 @@ namespace TwitchDownloaderWPF
             {
                 comboFont.Items.Add(font);
             }
-            comboFont.SelectedItem = "Inter Embedded";
+            comboFont.SelectedItem = "Roboto";
 
             Codec h264Codec = new Codec() { Name = "H264", InputArgs = "-framerate {fps} -f rawvideo -analyzeduration {max_int} -probesize {max_int} -pix_fmt bgra -video_size {width}x{height} -i -", OutputArgs = "-c:v libx264 -preset:v veryfast -crf 18 -pix_fmt yuv420p \"{save_path}\"" };
             Codec h264NvencCodec = new Codec() { Name = "H264 NVIDIA", InputArgs = "-framerate {fps} -f rawvideo -analyzeduration {max_int} -probesize {max_int} -pix_fmt bgra -video_size {width}x{height} -i -", OutputArgs = "-c:v h264_nvenc -preset:v p4 -cq 20 -pix_fmt yuv420p \"{save_path}\"" };
@@ -600,6 +548,7 @@ namespace TwitchDownloaderWPF
 
                 Progress<ProgressReport> renderProgress = new Progress<ProgressReport>(OnProgressChanged);
                 ChatRenderer currentRender = new ChatRenderer(options, renderProgress);
+                Console.WriteLine(options.ToString());
                 try
                 {
                     await currentRender.ParseJsonAsync(CancellationToken.None);
@@ -678,11 +627,6 @@ namespace TwitchDownloaderWPF
             }
         }
 
-        private void BtnEnqueue_Click(object sender, RoutedEventArgs e)
-        {
-            EnqueueRender();
-        }
-
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             statusMessage.Text = Translations.Strings.StatusCanceling;
@@ -691,29 +635,6 @@ namespace TwitchDownloaderWPF
                 _cancellationTokenSource.Cancel();
             }
             catch (ObjectDisposedException) { }
-        }
-
-        private void MenuItemEnqueue_Click(object sender, RoutedEventArgs e)
-        {
-            if (!SplitBtnRender.IsDropDownOpen)
-            {
-                return;
-            }
-
-            if (ValidateInputs())
-            {
-                EnqueueRender();
-            }
-            else
-            {
-                MessageBox.Show(Translations.Strings.UnableToParseInputsMessage, Translations.Strings.UnableToParseInputs, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void EnqueueRender()
-        {
-            var queueOptions = new WindowQueueOptions(this);
-            queueOptions.ShowDialog();
         }
 
         private void MenuItemPartialRender_Click(object sender, RoutedEventArgs e)

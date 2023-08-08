@@ -14,6 +14,7 @@ namespace TwitchDownloaderCore.TwitchObjects
         public SKCodec Codec { get; set; }
         public int FrameCount { get; set; }
         public List<int> DurationList { get; set; }
+        public int RepetitionCount { get; set; }
         public int TotalDuration { get; set; }
         public int ImageScale { get; set; }
         public int Width { get; set; }
@@ -29,6 +30,7 @@ namespace TwitchDownloaderCore.TwitchObjects
             ImageScale = imageScale;
             ImageFrames = imageFrames;
             FrameCount = codec.FrameCount;
+            RepetitionCount = codec.RepetitionCount;
 
             DurationList = new List<int>();
             for (int i = 0; i < FrameCount; i++)

@@ -15,12 +15,8 @@ namespace TwitchDownloaderWPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static PageVodDownload pageVodDownload = new PageVodDownload();
-        public static PageClipDownload pageClipDownload = new PageClipDownload();
         public static PageChatDownload pageChatDownload = new PageChatDownload();
-        public static PageChatUpdate pageChatUpdate = new PageChatUpdate();
         public static PageChatRender pageChatRender = new PageChatRender();
-        public static PageQueue pageQueue = new PageQueue();
 
         public MainWindow()
         {
@@ -28,24 +24,9 @@ namespace TwitchDownloaderWPF
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
 
-        private void btnVodDownload_Click(object sender, RoutedEventArgs e)
-        {
-            Main.Content = pageVodDownload;
-        }
-
-        private void btnClipDownload_Click(object sender, RoutedEventArgs e)
-        {
-            Main.Content = pageClipDownload;
-        }
-
         private void btnChatDownload_Click(object sender, RoutedEventArgs e)
         {
             Main.Content = pageChatDownload;
-        }
-
-        private void btnChatUpdate_Click(object sender, RoutedEventArgs e)
-        {
-            Main.Content = pageChatUpdate;
         }
 
         private void btnChatRender_Click(object sender, RoutedEventArgs e)
@@ -53,16 +34,11 @@ namespace TwitchDownloaderWPF
             Main.Content = pageChatRender;
         }
 
-        private void btnQueue_Click(object sender, RoutedEventArgs e)
-        {
-            Main.Content = pageQueue;
-        }
-
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             AppSingleton.RequestAppThemeChange();
 
-            Main.Content = pageVodDownload;
+            Main.Content = pageChatDownload;
             if (Settings.Default.UpgradeRequired)
             {
                 Settings.Default.Upgrade();
@@ -93,7 +69,6 @@ namespace TwitchDownloaderWPF
 
             Version currentVersion = new Version("1.53.0");
             Title = $"Twitch Downloader v{currentVersion}";
-            AutoUpdater.InstalledVersion = currentVersion;
 #if !DEBUG
             if (AppContext.BaseDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
             {

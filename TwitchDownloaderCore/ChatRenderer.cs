@@ -74,6 +74,7 @@ namespace TwitchDownloaderCore
             FloorCommentOffsets(chatRoot.comments);
 
             outlinePaint = new SKPaint() { Style = SKPaintStyle.Stroke, StrokeWidth = (float)(renderOptions.OutlineSize * renderOptions.ReferenceScale), StrokeJoin = SKStrokeJoin.Round, Color = SKColors.Black, IsAntialias = true, IsAutohinted = true, LcdRenderText = true, SubpixelText = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High };
+            outlinePaint.MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 1.6f);
             nameFont = new SKPaint() { LcdRenderText = true, SubpixelText = true, TextSize = (float)renderOptions.FontSize, IsAntialias = true, IsAutohinted = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High };
             messageFont = new SKPaint() { LcdRenderText = true, SubpixelText = true, TextSize = (float)renderOptions.FontSize, IsAntialias = true, IsAutohinted = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High, Color = renderOptions.MessageColor };
 
@@ -213,7 +214,7 @@ namespace TwitchDownloaderCore
         {
             for (int i = 0; i < comments.Count; i++)
             {
-                if (renderOptions.IgnoreUsersArray.Contains(comments[i].commenter.name.ToLower()))
+                if (renderOptions.IgnoreUsersArray.Contains(comments[i].commenter.display_name.ToLower()))
                 {
                     comments.RemoveAt(i);
                     i--;
@@ -267,6 +268,10 @@ namespace TwitchDownloaderCore
 
             for (int currentTick = startTick; currentTick < endTick; currentTick++)
             {
+                // if (latestUpdate is not null)
+                // {
+                //     File.WriteAllBytes($"/tmp/TwitchDownloader/poggers/{currentTick}.png", SKImage.FromBitmap(latestUpdate.Image).Encode().ToArray());
+                // }
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (currentTick % renderOptions.UpdateFrame == 0)
@@ -456,7 +461,7 @@ namespace TwitchDownloaderCore
                                 }
                                 imageFrame -= emote.EmoteFrameDurations[i] * 10;
                             }
-
+                            
                             frameCanvas.DrawBitmap(emote.EmoteFrames[frameIndex], drawPoint.X, drawPoint.Y + frameHeight);
                         }
                     }
@@ -477,29 +482,43 @@ namespace TwitchDownloaderCore
             }
             lastUpdate?.Image.Dispose();
 
-            List<CommentSection> commentList = lastUpdate?.Comments ?? new List<CommentSection>();
+            List<CommentSection> commentListOld = lastUpdate?.Comments ?? new List<CommentSection>();
 
             int oldCommentIndex = -1;
-            if (commentList.Count > 0)
+            if (commentListOld.Count > 0)
             {
-                oldCommentIndex = commentList.Last().CommentIndex;
+                oldCommentIndex = commentListOld.Last().CommentIndex;
             }
 
             if (newestCommentIndex > oldCommentIndex)
             {
                 int currentIndex = oldCommentIndex + 1;
-
                 do
                 {
                     CommentSection comment = GenerateCommentSection(currentIndex, sectionDefaultYPos, highlightIcons);
                     if (comment != null)
                     {
-                        commentList.Add(comment);
+                        commentListOld.Add(comment);
                     }
                     currentIndex++;
                 }
                 while (newestCommentIndex >= currentIndex);
             }
+
+            // commentListOld.Reverse();
+            List<CommentSection> commentList = new List<CommentSection>(commentListOld);
+            foreach (var item in commentListOld)
+            {
+                if (item.ComboCount > 0)
+                {
+                    var toRemove = commentList.FindAll(c => c.CommentIndex < item.CommentIndex && c.CommentIndex > (item.CommentIndex - item.ComboCount));
+                    foreach (var rem in toRemove)
+                    {
+                        commentList.Remove(rem);
+                    }
+                }
+            }
+            // commentList.Reverse();
 
             using (SKCanvas frameCanvas = new SKCanvas(newFrame))
             {
@@ -511,14 +530,16 @@ namespace TwitchDownloaderCore
                 while (commentListIndex >= 0 && frameHeight > -renderOptions.VerticalPadding)
                 {
                     var comment = commentList[commentListIndex];
-                    frameHeight -= comment.Image.Height + renderOptions.VerticalPadding;
+                    var prevComment = commentListIndex > 0 ? commentList[commentListIndex-1] : null;
 
+                    frameHeight -= comment.Image.Height + renderOptions.VerticalPadding;
                     if (renderOptions.AlternateMessageBackgrounds && comment.CommentIndex % 2 == 1)
                     {
                         frameCanvas.DrawRect(0, frameHeight - renderOptions.VerticalPadding / 2f, newFrame.Width, comment.Image.Height + renderOptions.VerticalPadding, renderOptions.AlternateBackgroundPaint);
                     }
 
                     frameCanvas.DrawBitmap(comment.Image, 0, frameHeight);
+                    // File.WriteAllBytes($"/tmp/TwitchDownloader/poggers2/{currentTick}.png", SKImage.FromBitmap(newFrame).Encode().ToArray());
 
                     for (int i = 0; i < comment.Emotes.Count; i++)
                     {
@@ -530,6 +551,7 @@ namespace TwitchDownloaderCore
                             frameCanvas.DrawBitmap(emote.EmoteFrames[0], drawPoint.X, drawPoint.Y + frameHeight);
                         }
                     }
+
                     commentsDrawn++;
                     commentListIndex--;
                 }
@@ -555,24 +577,6 @@ namespace TwitchDownloaderCore
             Point defaultPos = new Point();
             var highlightType = HighlightType.None;
             defaultPos.X = renderOptions.SidePadding;
-
-            if (comment.message.user_notice_params?.msg_id != null)
-            {
-                if (comment.message.user_notice_params.msg_id is not "highlighted-message" and not "sub" and not "resub" and not "subgift" and not "")
-                {
-                    return null;
-                }
-                if (comment.message.user_notice_params.msg_id == "highlighted-message" && comment.message.fragments == null && comment.message.body != null)
-                {
-                    comment.message.fragments = new List<Fragment> { new Fragment() };
-                    comment.message.fragments[0].text = comment.message.body;
-                    highlightType = HighlightType.ChannelPointHighlight;
-                }
-            }
-            if (comment.message.fragments == null || comment.commenter == null)
-            {
-                return null;
-            }
 
             AddImageSection(sectionImages, ref drawPos, defaultPos);
             defaultPos.Y = sectionDefaultYPos;
@@ -601,6 +605,7 @@ namespace TwitchDownloaderCore
             newSection.Image = finalBitmap;
             newSection.Emotes = emoteSectionList;
             newSection.CommentIndex = commentIndex;
+            newSection.ComboCount = comment.message.comboCount;
 
             return newSection;
         }
@@ -653,12 +658,21 @@ namespace TwitchDownloaderCore
             {
                 DrawTimestamp(comment, sectionImages, ref drawPos, ref defaultPos);
             }
-            if (renderOptions.ChatBadges)
+            // if combo
+            if (comment.message.comboCount > 1)
             {
-                DrawBadges(comment, sectionImages, ref drawPos);
+                var commentClone = comment.Clone();
+                commentClone.message.body = $"{comment.message.body} {comment.message.comboCount}x C-C-C-COMBO";
+                commentClone.message.fragments[0].text = $"{comment.message.fragments[0].text} {comment.message.comboCount}x C-C-C-COMBO";
+                DrawMessage(commentClone, sectionImages, emotePositionList, highlightWords, ref drawPos, defaultPos);
+            } else {
+                if (renderOptions.ChatBadges)
+                {
+                    DrawBadges(comment, sectionImages, ref drawPos);
+                }
+                DrawUsername(comment, sectionImages, ref drawPos, defaultPos);
+                DrawMessage(comment, sectionImages, emotePositionList, highlightWords, ref drawPos, defaultPos);
             }
-            DrawUsername(comment, sectionImages, ref drawPos, defaultPos);
-            DrawMessage(comment, sectionImages, emotePositionList, highlightWords, ref drawPos, defaultPos);
         }
 
         private void DrawAccentedMessage(Comment comment, List<SKBitmap> sectionImages, List<(Point, TwitchEmote)> emotePositionList, HighlightType highlightType, HighlightMessage highlightIcons, ref Point drawPos, Point defaultPos)
@@ -710,15 +724,6 @@ namespace TwitchDownloaderCore
 
             // Remove the commenter's name from the resub message
             comment.message.body = comment.message.body[(comment.commenter.display_name.Length + 1)..];
-            if (comment.message.fragments[0].text.Equals(comment.commenter.display_name, StringComparison.OrdinalIgnoreCase))
-            {
-                // Some older chat replays separate user names into separate fragments
-                comment.message.fragments.RemoveAt(0);
-            }
-            else
-            {
-                comment.message.fragments[0].text = comment.message.fragments[0].text[(comment.commenter.display_name.Length + 1)..];
-            }
 
             var (resubMessage, customResubMessage) = HighlightMessage.SplitSubComment(comment);
             DrawMessage(resubMessage, sectionImages, emotePositionList, false, ref drawPos, defaultPos);
@@ -1310,8 +1315,8 @@ namespace TwitchDownloaderCore
                 foreach (var badge in comment.message.user_badges)
                 {
                     bool foundBadge = false;
-                    string id = badge._id.ToString();
-                    string version = badge.version.ToString();
+                    string id = badge;
+                    string version = badge;
 
                     foreach (var cachedBadge in badgeList)
                     {
@@ -1371,13 +1376,13 @@ namespace TwitchDownloaderCore
         /// <remarks>chatRoot.embeddedData will be empty after calling this to save on memory!</remarks>
         private async Task FetchScaledImages(CancellationToken cancellationToken)
         {
-            var badgeTask = GetScaledBadges(cancellationToken);
-            var emoteTask = GetScaledEmotes(cancellationToken);
+            // var badgeTask = GetScaledBadges(cancellationToken);
+            // var emoteTask = GetScaledEmotes(cancellationToken);
             var emoteThirdTask = GetScaledThirdEmotes(cancellationToken);
-            var cheerTask = GetScaledBits(cancellationToken);
+            // var cheerTask = GetScaledBits(cancellationToken);
             var emojiTask = GetScaledEmojis(cancellationToken);
 
-            await Task.WhenAll(badgeTask, emoteTask, emoteThirdTask, cheerTask, emojiTask);
+            await Task.WhenAll(emoteThirdTask, emojiTask);
 
             // Clear chatRoot.embeddedData and manually call GC to save some memory
             chatRoot.embeddedData = null;
@@ -1385,10 +1390,10 @@ namespace TwitchDownloaderCore
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            badgeList = badgeTask.Result;
-            emoteList = emoteTask.Result;
+            // badgeList = badgeTask.Result;
+            // emoteList = emoteTask.Result;
             emoteThirdList = emoteThirdTask.Result;
-            cheermotesList = cheerTask.Result;
+            // cheermotesList = cheerTask.Result;
             emojiCache = emojiTask.Result;
         }
 

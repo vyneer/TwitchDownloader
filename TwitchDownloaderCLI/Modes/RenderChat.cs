@@ -49,15 +49,15 @@ namespace TwitchDownloaderCLI.Modes
                 ChatBadgeMask = inputOptions.BadgeFilterMask,
                 MessageFontStyle = inputOptions.MessageFontStyle.ToLower() switch
                 {
-                    "normal" => SKFontStyle.Normal,
-                    "bold" => SKFontStyle.Bold,
+                    "normal" => new SKFontStyle(500, SKFontStyle.Normal.Width, SKFontStyle.Normal.Slant),
+                    "bold" => new SKFontStyle(500, SKFontStyle.Bold.Width, SKFontStyle.Bold.Slant),
                     "italic" or "italics" => SKFontStyle.Italic,
                     _ => throw new NotSupportedException("Invalid message font style. Valid values are: normal, bold, and italic")
                 },
                 UsernameFontStyle = inputOptions.UsernameFontStyle.ToLower() switch
                 {
                     "normal" => SKFontStyle.Normal,
-                    "bold" => SKFontStyle.Bold,
+                    "bold" => new SKFontStyle(500, SKFontStyle.Bold.Width, SKFontStyle.Bold.Slant),
                     "italic" or "italics" => SKFontStyle.Italic,
                     _ => throw new NotSupportedException("Invalid username font style. Valid values are: normal, bold, and italic")
                 },

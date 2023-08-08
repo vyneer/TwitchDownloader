@@ -21,7 +21,6 @@ namespace TwitchDownloaderCLI
                 .WithParsed<VideoDownloadArgs>(DownloadVideo.Download)
                 .WithParsed<ClipDownloadArgs>(DownloadClip.Download)
                 .WithParsed<ChatDownloadArgs>(DownloadChat.Download)
-                .WithParsed<ChatUpdateArgs>(UpdateChat.Update)
                 .WithParsed<ChatRenderArgs>(RenderChat.Render)
                 .WithParsed<FfmpegArgs>(FfmpegHandler.ParseArgs)
                 .WithParsed<CacheArgs>(CacheHandler.ParseArgs)

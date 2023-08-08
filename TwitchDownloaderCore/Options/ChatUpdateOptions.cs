@@ -26,8 +26,6 @@ namespace TwitchDownloaderCore.Options
                 {
                     ChatFormat.Json when Compression is ChatCompression.None => "json",
                     ChatFormat.Json when Compression is ChatCompression.Gzip => "json.gz",
-                    ChatFormat.Html => "html",
-                    ChatFormat.Text => "txt",
                     _ => ""
                 };
             }

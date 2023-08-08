@@ -485,9 +485,9 @@ namespace TwitchDownloaderCore
 
             var nameList = comments.Where(comment => comment.message.user_badges != null)
                 .SelectMany(comment => comment.message.user_badges)
-                .Where(badge => !String.IsNullOrWhiteSpace(badge._id))
-                .Where(badge => globalBadges.ContainsKey(badge._id) || subBadges.ContainsKey(badge._id))
-                .Select(badge => badge._id).Distinct();
+                .Where(badge => !String.IsNullOrWhiteSpace(badge))
+                .Where(badge => globalBadges.ContainsKey(badge) || subBadges.ContainsKey(badge))
+                .Select(badge => badge).Distinct();
 
             foreach (var name in nameList)
             {

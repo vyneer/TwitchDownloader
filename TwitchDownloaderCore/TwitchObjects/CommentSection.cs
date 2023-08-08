@@ -7,6 +7,8 @@ namespace TwitchDownloaderCore.TwitchObjects
     {
         public SKBitmap Image { get; set; }
         public List<(Point drawPoint, TwitchEmote emote)> Emotes { get; set; }
+
+        public int ComboCount { get; set; }
         public int CommentIndex { get; set; }
     }
 

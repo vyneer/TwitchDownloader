@@ -53,30 +53,18 @@
         </StackPanel>
         <!-- MIDDLE -->
         <WrapPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Margin="0,0,0,10" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Margin="3,8,3,3" Text="{lex:Loc VodClipLink}" Foreground="{DynamicResource AppText}" />
-            <TextBox x:Name="textUrl" Margin="3" MinWidth="200" MaxWidth="400" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-            <Button x:Name="btnGetInfo" Margin="3" MinWidth="50" Content="{lex:Loc GetInfo}" RenderTransformOrigin="0.503,0.508" Click="btnGetInfo_Click" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}" />
+            <TextBlock Margin="3,8,3,3" Text="{lex:Loc StartTime}" Foreground="{DynamicResource AppText}" />
+            <TextBox x:Name="startTime" Margin="3" MinWidth="200" MaxWidth="400" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
+            <TextBlock Margin="3,8,3,3" Text="{lex:Loc EndTime}" Foreground="{DynamicResource AppText}" />
+            <TextBox x:Name="endTime" Margin="3" MinWidth="200" MaxWidth="400" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
         </WrapPanel>
         <StackPanel Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
             <StackPanel HorizontalAlignment="Left">
-                <TextBlock Text="{lex:Loc Length}" HorizontalAlignment="Right" Foreground="{DynamicResource AppText}" />
-                <TextBlock Text="{lex:Loc DownloadFormat}" HorizontalAlignment="Right" Margin="0,13,0,0" Foreground="{DynamicResource AppText}" />
                 <TextBlock Visibility="Visible" x:Name="compressionText" Text="{lex:Loc ChatCompression}" HorizontalAlignment="Right" Margin="0,15,0,0" Foreground="{DynamicResource AppText}" />
                 <TextBlock Visibility="Collapsed" x:Name="timeText" Text="{lex:Loc TimestampFormat}" HorizontalAlignment="Right" Margin="0,15,0,0" Foreground="{DynamicResource AppText}" />
-                <TextBlock x:Name="textCrop" Text="{lex:Loc ChatCrop}" HorizontalAlignment="Right" Margin="0,12,0,36" Foreground="{DynamicResource AppText}" />
-                <StackPanel x:Name="stackEmbedText" Visibility="Visible">
-                    <TextBlock HorizontalAlignment="Right" Margin="0,8,0,0" Foreground="{DynamicResource AppText}" ><Run Text="{lex:Loc EmbedImages}"/><Hyperlink ToolTipService.ShowDuration="30000" Foreground="{DynamicResource AppHyperlink}"><Hyperlink.ToolTip><Run Text="{lex:Loc EmbedImagesTooltip}"/></Hyperlink.ToolTip>(?)</Hyperlink>:</TextBlock>
-                    <TextBlock HorizontalAlignment="Right" Margin="0,8,0,0" Foreground="{DynamicResource AppText}" ><Run Text="{lex:Loc ThirdPartyEmotes}"/><Hyperlink ToolTipService.ShowDuration="30000" Foreground="{DynamicResource AppHyperlink}"><Hyperlink.ToolTip><Run Text="{lex:Loc ThirdPartyEmotesTooltip}"/></Hyperlink.ToolTip>(?)</Hyperlink>:</TextBlock>
-                </StackPanel>
                 <TextBlock HorizontalAlignment="Right" Text="{lex:Loc DownloadConnections}" Margin="0,14,0,0" Foreground="{DynamicResource AppText}" />
             </StackPanel>
             <StackPanel>
-                <TextBlock x:Name="labelLength" Text="0:0:0" Margin="5,0,0,0" Foreground="{DynamicResource AppText}" />
-                <hc:ButtonGroup Margin="5,6,0,0">
-                    <RadioButton x:Name="radioJson" IsChecked="True" Content="JSON" Checked="radioJson_Checked" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                    <RadioButton x:Name="radioText" Checked="radioText_Checked" Content="Text" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                    <RadioButton x:Name="radioHTML" Content="HTML" Checked="radioHTML_Checked" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                </hc:ButtonGroup>
                 <StackPanel Visibility="Visible" x:Name="compressionOptions" Margin="5,8,0,0" Orientation="Horizontal">
                     <RadioButton x:Name="radioCompressionNone" IsChecked="True" Content="{lex:Loc ChatCompressionNone}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
                     <RadioButton x:Name="radioCompressionGzip" Content="{lex:Loc ChatCompressionGzip}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
@@ -86,41 +74,11 @@
                     <RadioButton x:Name="radioTimestampRelative" Content="{lex:Loc TimestampRelative}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
                     <RadioButton x:Name="radioTimestampNone" Content="{lex:Loc TimestampNone}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
                 </StackPanel>
-                <StackPanel Margin="5,5,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox x:Name="checkCropStart" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkCropStart_OnCheckStateChanged" Unchecked="checkCropStart_OnCheckStateChanged" BorderBrush="{DynamicResource AppElementBorder}" />
-                        <TextBlock Margin="2,0,0,0" Text="{lex:Loc CropStart}" VerticalAlignment="Center" Foreground="{DynamicResource AppText}" />
-                        <hc:NumericUpDown Margin="3,-1,0,0" Minimum="0" Maximum="48" Value="0" x:Name="numStartHour" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                        <hc:NumericUpDown Margin="3,-1,0,0" Minimum="0" Maximum="60" Value="0" x:Name="numStartMinute" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                        <hc:NumericUpDown Margin="3,-1,0,0" Minimum="0" Maximum="60" Value="0" x:Name="numStartSecond" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                        <CheckBox x:Name="checkCropEnd" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkCropEnd_OnCheckStateChanged" Unchecked="checkCropEnd_OnCheckStateChanged" BorderBrush="{DynamicResource AppElementBorder}" />
-                        <TextBlock Margin="2,0,5,0" Text="{lex:Loc CropEnd}" VerticalAlignment="Center" Foreground="{DynamicResource AppText}"/>
-                        <hc:NumericUpDown Margin="3,-1,0,0" Minimum="0" Maximum="48" Value="0" x:Name="numEndHour" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                        <hc:NumericUpDown Margin="3,-1,0,0" Minimum="0" Maximum="60" Value="0" x:Name="numEndMinute" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                        <hc:NumericUpDown Margin="3,-1,0,0" Minimum="0" Maximum="60" Value="0" x:Name="numEndSecond" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel x:Name="stackEmbedChecks" Visibility="Visible">
-                    <CheckBox x:Name="checkEmbed" Margin="5,5,0,0" Checked="checkEmbed_Checked" Unchecked="checkEmbed_Unchecked" BorderBrush="{DynamicResource AppElementBorder}" />
-                    <StackPanel Margin="5,8,0,0" Orientation="Horizontal">
-                        <CheckBox IsEnabled="False" x:Name="checkBttvEmbed" Margin="0,0,10,0" Checked="checkBttvEmbed_Checked" Unchecked="checkBttvEmbed_Unchecked" Content="BTTV" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                        <CheckBox IsEnabled="False" x:Name="checkFfzEmbed" Margin="0,0,10,0" Checked="checkFfzEmbed_Checked" Unchecked="checkFfzEmbed_Unchecked" Content="FFZ" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                        <CheckBox IsEnabled="False" x:Name="checkStvEmbed" Margin="0,0,10,0" Checked="checkStvEmbed_Checked" Unchecked="checkStvEmbed_Unchecked" Content="7TV" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                    </StackPanel>
-                </StackPanel>
                 <hc:NumericUpDown Margin="5,8,0,0" Minimum="1" Value="1" x:Name="numChatDownloadConnections" HorizontalAlignment="Left" ValueChanged="numChatDownloadConnections_ValueChanged" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom">
             <hc:SplitButton x:Name="SplitBtnDownload" Height="40" Width="120" Content="{lex:Loc Download}" Click="SplitBtnDownload_Click" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}" >
-                <hc:SplitButton.DropDownContent>
-                    <StackPanel>
-                        <MenuItem x:Name="MenuItemEnqueue" Header="{lex:Loc EnqueueDownload}" Click="MenuItemEnqueue_Click" />
-                    </StackPanel>
-                </hc:SplitButton.DropDownContent>
             </hc:SplitButton>
             <Button x:Name="BtnCancel" Height="40" MinWidth="120" Margin="0,6,0,0" Content="{lex:Loc TaskCancel}" Click="BtnCancel_Click" Visibility="Collapsed" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}"/>
         </StackPanel>

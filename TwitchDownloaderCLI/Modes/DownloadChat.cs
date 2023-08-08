@@ -24,17 +24,9 @@ namespace TwitchDownloaderCLI.Modes
 
         private static ChatDownloadOptions GetDownloadOptions(ChatDownloadArgs inputOptions)
         {
-            if (inputOptions.Id is null)
+            if (inputOptions.StartTime is null || inputOptions.EndTime is null)
             {
-                Console.WriteLine("[ERROR] - Vod/Clip ID/URL cannot be null!");
-                Environment.Exit(1);
-            }
-
-            var vodClipIdRegex = new Regex(@"(?<=^|(?:clips\.)?twitch\.tv\/(?:videos|\S+\/clip)?\/?)[\w-]+?(?=$|\?)");
-            var vodClipIdMatch = vodClipIdRegex.Match(inputOptions.Id);
-            if (!vodClipIdMatch.Success)
-            {
-                Console.WriteLine("[ERROR] - Unable to parse Vod/Clip ID/URL.");
+                Console.WriteLine("[ERROR] - Start or end time cannot be null!");
                 Environment.Exit(1);
             }
 
@@ -44,16 +36,11 @@ namespace TwitchDownloaderCLI.Modes
             {
                 DownloadFormat = fileExtension switch
                 {
-                    ".html" or ".htm" => ChatFormat.Html,
                     ".json" => ChatFormat.Json,
-                    ".txt" or ".text" or "" => ChatFormat.Text,
                     _ => throw new NotSupportedException($"{fileExtension} is not a valid chat file extension.")
                 },
-                Id = vodClipIdMatch.Value,
-                CropBeginning = inputOptions.CropBeginningTime > 0.0,
-                CropBeginningTime = inputOptions.CropBeginningTime,
-                CropEnding = inputOptions.CropEndingTime > 0.0,
-                CropEndingTime = inputOptions.CropEndingTime,
+                StartTime = inputOptions.StartTime,
+                EndTime = inputOptions.EndTime,
                 EmbedData = inputOptions.EmbedData,
                 Filename = inputOptions.Compression is ChatCompression.Gzip
                     ? inputOptions.OutputFile + ".gz"
@@ -61,9 +48,6 @@ namespace TwitchDownloaderCLI.Modes
                 Compression = inputOptions.Compression,
                 TimeFormat = inputOptions.TimeFormat,
                 ConnectionCount = inputOptions.ChatConnections,
-                BttvEmotes = (bool)inputOptions.BttvEmotes!,
-                FfzEmotes = (bool)inputOptions.FfzEmotes!,
-                StvEmotes = (bool)inputOptions.StvEmotes!,
                 TempFolder = inputOptions.TempFolder
             };
 

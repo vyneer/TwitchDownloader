@@ -125,7 +125,7 @@ namespace TwitchDownloaderCore.Chat
 
             if (chatRoot.streamer is null)
             {
-                var assumedId = int.Parse(chatRoot.video.user_id ?? chatRoot.comments.FirstOrDefault()?.channel_id ?? "0");
+                var assumedId = int.Parse(chatRoot.video.user_id ?? "0");
                 var assumedName = chatRoot.video.user_name ?? await TwitchHelper.GetStreamerName(assumedId);
 
                 chatRoot.streamer = new Streamer { id = assumedId, name = assumedName };

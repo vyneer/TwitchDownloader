@@ -18,7 +18,7 @@ namespace TwitchDownloaderCLI.Modes.Arguments
         [Option("alt-background-color", Default = "#191919", HelpText = "The alternate message background color in the string format of '#RRGGBB' or '#AARRGGBB' in hexadecimal. Requires --alternate-backgrounds")]
         public string AlternateBackgroundColor { get; set; }
 
-        [Option("message-color", Default = "#ffffff", HelpText = "The message text color in the string format of '#RRGGBB' or '#AARRGGBB' in hexadecimal.")]
+        [Option("message-color", Default = "#dedede", HelpText = "The message text color in the string format of '#RRGGBB' or '#AARRGGBB' in hexadecimal.")]
         public string MessageColor { get; set; }
 
         [Option('w', "chat-width", Default = 350, HelpText = "Width of chat render.")]
@@ -51,16 +51,16 @@ namespace TwitchDownloaderCLI.Modes.Arguments
         [Option("badges", Default = true, HelpText = "Enable chat badges.")]
         public bool? ChatBadges { get; set; }
 
-        [Option("outline", Default = false, HelpText = "Enable outline around chat messages.")]
+        [Option("outline", Default = true, HelpText = "Enable outline around chat messages.")]
         public bool Outline { get; set; }
 
-        [Option("outline-size", Default = 4, HelpText = "Size of outline if outline is enabled.")]
+        [Option("outline-size", Default = 2.4, HelpText = "Size of outline if outline is enabled.")]
         public double OutlineSize { get; set; }
 
-        [Option('f', "font", Default = "Inter Embedded", HelpText = "Font to use.")]
+        [Option('f', "font", Default = "Roboto", HelpText = "Font to use.")]
         public string Font { get; set; }
 
-        [Option("font-size", Default = 12, HelpText = "Font size.")]
+        [Option("font-size", Default = 36, HelpText = "Font size.")]
         public double FontSize { get; set; }
 
         [Option("message-fontstyle", Default = "normal", HelpText = "Font style of messages. Valid values are normal, bold, and italic.")]
@@ -78,10 +78,10 @@ namespace TwitchDownloaderCLI.Modes.Arguments
         [Option("sharpening", Default = false, HelpText = "Appends a smartblur sharpening filter to the input-args. Works best with font-size 24 or larger.")]
         public bool Sharpening { get; set; }
 
-        [Option("framerate", Default = 30, HelpText = "Framerate of the render.")]
+        [Option("framerate", Default = 60, HelpText = "Framerate of the render.")]
         public int Framerate { get; set; }
 
-        [Option("update-rate", Default = 0.2, HelpText = "Time in seconds to update chat render output.")]
+        [Option("update-rate", Default = 0.1, HelpText = "Time in seconds to update chat render output.")]
         public double UpdateRate { get; set; }
 
         [Option("input-args", Default = "-framerate {fps} -f rawvideo -analyzeduration {max_int} -probesize {max_int} -pix_fmt {pix_fmt} -video_size {width}x{height} -i -", HelpText = "Input arguments for ffmpeg chat render.")]

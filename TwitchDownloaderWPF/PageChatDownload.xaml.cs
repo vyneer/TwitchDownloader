@@ -41,163 +41,18 @@ namespace TwitchDownloaderWPF
 
         private void Page_Initialized(object sender, EventArgs e)
         {
-            SetEnabled(false, false);
-            SetEnabledCropStart(false);
-            SetEnabledCropEnd(false);
-            checkEmbed.IsChecked = Settings.Default.ChatEmbedEmotes;
-            checkBttvEmbed.IsChecked = Settings.Default.BTTVEmotes;
-            checkFfzEmbed.IsChecked = Settings.Default.FFZEmotes;
-            checkStvEmbed.IsChecked = Settings.Default.STVEmotes;
+            SetEnabled(true, false);
             numChatDownloadConnections.Value = Settings.Default.ChatDownloadThreads;
-            _ = (ChatFormat)Settings.Default.ChatDownloadType switch
-            {
-                ChatFormat.Text => radioText.IsChecked = true,
-                ChatFormat.Html => radioHTML.IsChecked = true,
-                _ => radioJson.IsChecked = true
-            };
         }
 
         private void SetEnabled(bool isEnabled, bool isClip)
         {
-            checkCropStart.IsEnabled = isEnabled & !isClip;
-            checkCropEnd.IsEnabled = isEnabled & !isClip;
             radioTimestampRelative.IsEnabled = isEnabled;
             radioTimestampUTC.IsEnabled = isEnabled;
             radioTimestampNone.IsEnabled = isEnabled;
             radioCompressionNone.IsEnabled = isEnabled;
             radioCompressionGzip.IsEnabled = isEnabled;
-            checkEmbed.IsEnabled = isEnabled;
-            checkBttvEmbed.IsEnabled = isEnabled;
-            checkFfzEmbed.IsEnabled = isEnabled;
-            checkStvEmbed.IsEnabled = isEnabled;
             SplitBtnDownload.IsEnabled = isEnabled;
-            MenuItemEnqueue.IsEnabled = isEnabled;
-            radioJson.IsEnabled = isEnabled;
-            radioText.IsEnabled = isEnabled;
-            radioHTML.IsEnabled = isEnabled;
-        }
-
-        private void SetEnabledCropStart(bool isEnabled)
-        {
-            numStartHour.IsEnabled = isEnabled;
-            numStartMinute.IsEnabled = isEnabled;
-            numStartSecond.IsEnabled = isEnabled;
-        }
-
-        private void SetEnabledCropEnd(bool isEnabled)
-        {
-            numEndHour.IsEnabled = isEnabled;
-            numEndMinute.IsEnabled = isEnabled;
-            numEndSecond.IsEnabled = isEnabled;
-        }
-
-        private async void btnGetInfo_Click(object sender, RoutedEventArgs e)
-        {
-            string id = ValidateUrl(textUrl.Text.Trim());
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                MessageBox.Show(Translations.Strings.UnableToParseLinkMessage, Translations.Strings.UnableToParseLink, MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            btnGetInfo.IsEnabled = false;
-            downloadId = id;
-            downloadType = id.All(char.IsDigit) ? DownloadType.Video : DownloadType.Clip;
-
-            try
-            {
-                if (downloadType == DownloadType.Video)
-                {
-                    GqlVideoResponse videoInfo = await TwitchHelper.GetVideoInfo(int.Parse(downloadId));
-
-                    try
-                    {
-                        string thumbUrl = videoInfo.data.video.thumbnailURLs.FirstOrDefault();
-                        imgThumbnail.Source = await ThumbnailService.GetThumb(thumbUrl);
-                    }
-                    catch
-                    {
-                        AppendLog(Translations.Strings.ErrorLog + Translations.Strings.UnableToFindThumbnail);
-                        var (success, image) = await ThumbnailService.TryGetThumb(ThumbnailService.THUMBNAIL_MISSING_URL);
-                        if (success)
-                        {
-                            imgThumbnail.Source = image;
-                        }
-                    }
-                    vodLength = TimeSpan.FromSeconds(videoInfo.data.video.lengthSeconds);
-                    textTitle.Text = videoInfo.data.video.title;
-                    textStreamer.Text = videoInfo.data.video.owner.displayName;
-                    var videoTime = videoInfo.data.video.createdAt;
-                    textCreatedAt.Text = Settings.Default.UTCVideoTime ? videoTime.ToString(CultureInfo.CurrentCulture) : videoTime.ToLocalTime().ToString(CultureInfo.CurrentCulture);
-                    currentVideoTime = Settings.Default.UTCVideoTime ? videoTime : videoTime.ToLocalTime();
-                    streamerId = int.Parse(videoInfo.data.video.owner.id);
-                    var urlTimeCodeMatch = Regex.Match(textUrl.Text, @"(?<=\?t=)\d+h\d+m\d+s");
-                    if (urlTimeCodeMatch.Success)
-                    {
-                        var time = TimeSpanExtensions.ParseTimeCode(urlTimeCodeMatch.ValueSpan);
-                        checkCropStart.IsChecked = true;
-                        numStartHour.Value = time.Hours;
-                        numStartMinute.Value = time.Minutes;
-                        numStartSecond.Value = time.Seconds;
-                    }
-                    else
-                    {
-                        numStartHour.Value = 0;
-                        numStartMinute.Value = 0;
-                        numStartSecond.Value = 0;
-                    }
-                    numStartHour.Maximum = (int)vodLength.TotalHours;
-
-                    numEndHour.Value = (int)vodLength.TotalHours;
-                    numEndHour.Maximum = (int)vodLength.TotalHours;
-                    numEndMinute.Value = vodLength.Minutes;
-                    numEndSecond.Value = vodLength.Seconds;
-                    labelLength.Text = vodLength.ToString("c");
-                    SetEnabled(true, false);
-                }
-                else if (downloadType == DownloadType.Clip)
-                {
-                    string clipId = downloadId;
-                    GqlClipResponse clipInfo = await TwitchHelper.GetClipInfo(clipId);
-
-                    try
-                    {
-                        string thumbUrl = clipInfo.data.clip.thumbnailURL;
-                        imgThumbnail.Source = await ThumbnailService.GetThumb(thumbUrl);
-                    }
-                    catch
-                    {
-                        AppendLog(Translations.Strings.ErrorLog + Translations.Strings.UnableToFindThumbnail);
-                        var (success, image) = await ThumbnailService.TryGetThumb(ThumbnailService.THUMBNAIL_MISSING_URL);
-                        if (success)
-                        {
-                            imgThumbnail.Source = image;
-                        }
-                    }
-                    TimeSpan clipLength = TimeSpan.FromSeconds(clipInfo.data.clip.durationSeconds);
-                    textStreamer.Text = clipInfo.data.clip.broadcaster.displayName;
-                    var clipCreatedAt = clipInfo.data.clip.createdAt;
-                    textCreatedAt.Text = Settings.Default.UTCVideoTime ? clipCreatedAt.ToString(CultureInfo.CurrentCulture) : clipCreatedAt.ToLocalTime().ToString(CultureInfo.CurrentCulture);
-                    currentVideoTime = Settings.Default.UTCVideoTime ? clipCreatedAt : clipCreatedAt.ToLocalTime();
-                    textTitle.Text = clipInfo.data.clip.title;
-                    streamerId = int.Parse(clipInfo.data.clip.broadcaster.id);
-                    labelLength.Text = clipLength.ToString("c");
-                    SetEnabled(true, true);
-                    SetEnabledCropStart(false);
-                    SetEnabledCropEnd(false);
-                }
-
-                btnGetInfo.IsEnabled = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(Translations.Strings.UnableToGetInfoMessage, Translations.Strings.UnableToGetInfo, MessageBoxButton.OK, MessageBoxImage.Error);
-                AppendLog(Translations.Strings.ErrorLog + ex.Message);
-                btnGetInfo.IsEnabled = true;
-                if (Settings.Default.VerboseErrors)
-                {
-                    MessageBox.Show(ex.ToString(), Translations.Strings.VerboseErrorOutput, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
         }
 
         private void UpdateActionButtons(bool isDownloading)
@@ -231,22 +86,14 @@ namespace TwitchDownloaderWPF
         {
             ChatDownloadOptions options = new ChatDownloadOptions();
 
-            if (radioJson.IsChecked == true)
-                options.DownloadFormat = ChatFormat.Json;
-            else if (radioHTML.IsChecked == true)
-                options.DownloadFormat = ChatFormat.Html;
-            else if (radioText.IsChecked == true)
-                options.DownloadFormat = ChatFormat.Text;
+            options.DownloadFormat = ChatFormat.Json;
 
             if (radioCompressionNone.IsChecked == true)
                 options.Compression = ChatCompression.None;
             else if (radioCompressionGzip.IsChecked == true)
                 options.Compression = ChatCompression.Gzip;
 
-            options.EmbedData = (bool)checkEmbed.IsChecked;
-            options.BttvEmotes = (bool)checkBttvEmbed.IsChecked;
-            options.FfzEmotes = (bool)checkFfzEmbed.IsChecked;
-            options.StvEmotes = (bool)checkStvEmbed.IsChecked;
+            options.EmbedData = true;
             options.Filename = filename;
             options.ConnectionCount = (int)numChatDownloadConnections.Value;
             return options;
@@ -318,9 +165,6 @@ namespace TwitchDownloaderWPF
             {
                 Settings.Default.ChatEmbedEmotes = true;
                 Settings.Default.Save();
-                checkBttvEmbed.IsEnabled = true;
-                checkFfzEmbed.IsEnabled = true;
-                checkStvEmbed.IsEnabled = true;
             }
         }
 
@@ -329,114 +173,6 @@ namespace TwitchDownloaderWPF
             if (this.IsInitialized)
             {
                 Settings.Default.ChatEmbedEmotes = false;
-                Settings.Default.Save();
-                checkBttvEmbed.IsEnabled = false;
-                checkFfzEmbed.IsEnabled = false;
-                checkStvEmbed.IsEnabled = false;
-            }
-        }
-
-        private void checkBttvEmbed_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                Settings.Default.BTTVEmotes = true;
-                Settings.Default.Save();
-            }
-        }
-
-        private void checkBttvEmbed_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                Settings.Default.BTTVEmotes = false;
-                Settings.Default.Save();
-            }
-        }
-
-        private void checkFfzEmbed_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                Settings.Default.FFZEmotes = true;
-                Settings.Default.Save();
-            }
-        }
-
-        private void checkFfzEmbed_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                Settings.Default.FFZEmotes = false;
-                Settings.Default.Save();
-            }
-        }
-
-        private void checkStvEmbed_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                Settings.Default.STVEmotes = true;
-                Settings.Default.Save();
-            }
-        }
-
-        private void checkStvEmbed_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                Settings.Default.STVEmotes = false;
-                Settings.Default.Save();
-            }
-        }
-
-        private void radioJson_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                timeText.Visibility = Visibility.Collapsed;
-                timeOptions.Visibility = Visibility.Collapsed;
-                stackEmbedText.Visibility = Visibility.Visible;
-                stackEmbedChecks.Visibility = Visibility.Visible;
-                compressionText.Visibility = Visibility.Visible;
-                compressionOptions.Visibility = Visibility.Visible;
-                textCrop.Margin = new Thickness(0, 12, 0, 36);
-
-                Settings.Default.ChatDownloadType = (int)ChatFormat.Json;
-                Settings.Default.Save();
-            }
-        }
-
-        private void radioHTML_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                timeText.Visibility = Visibility.Collapsed;
-                timeOptions.Visibility = Visibility.Collapsed;
-                stackEmbedText.Visibility = Visibility.Visible;
-                stackEmbedChecks.Visibility = Visibility.Visible;
-                compressionText.Visibility = Visibility.Collapsed;
-                compressionOptions.Visibility = Visibility.Collapsed;
-                textCrop.Margin = new Thickness(0, 17, 0, 36);
-
-                Settings.Default.ChatDownloadType = (int)ChatFormat.Html;
-                Settings.Default.Save();
-            }
-        }
-
-        private void radioText_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.IsInitialized)
-            {
-                timeText.Visibility = Visibility.Visible;
-                timeOptions.Visibility = Visibility.Visible;
-                stackEmbedText.Visibility = Visibility.Collapsed;
-                stackEmbedChecks.Visibility = Visibility.Collapsed;
-                compressionText.Visibility = Visibility.Collapsed;
-                compressionOptions.Visibility = Visibility.Collapsed;
-                textCrop.Margin = new Thickness(0, 12, 0, 41);
-
-                Settings.Default.ChatDownloadType = (int)ChatFormat.Text;
                 Settings.Default.Save();
             }
         }
@@ -449,21 +185,16 @@ namespace TwitchDownloaderWPF
             }
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if (radioJson.IsChecked == true)
-            {
-                if (radioCompressionNone.IsChecked == true)
-                    saveFileDialog.Filter = "JSON Files | *.json";
-                else if (radioCompressionGzip.IsChecked == true)
-                    saveFileDialog.Filter = "GZip JSON Files | *.json.gz";
-            }
-            else if (radioHTML.IsChecked == true)
-                saveFileDialog.Filter = "HTML Files | *.html;*.htm";
-            else if (radioText.IsChecked == true)
-                saveFileDialog.Filter = "TXT Files | *.txt";
+            if (radioCompressionNone.IsChecked == true)
+                saveFileDialog.Filter = "JSON Files | *.json";
+            else if (radioCompressionGzip.IsChecked == true)
+                saveFileDialog.Filter = "GZip JSON Files | *.json.gz";
 
-            saveFileDialog.FileName = FilenameService.GetFilename(Settings.Default.TemplateChat, textTitle.Text, downloadId, currentVideoTime, textStreamer.Text,
-                checkCropStart.IsChecked == true ? new TimeSpan((int)numStartHour.Value, (int)numStartMinute.Value, (int)numStartSecond.Value) : TimeSpan.Zero,
-                checkCropEnd.IsChecked == true ? new TimeSpan((int)numEndHour.Value, (int)numEndMinute.Value, (int)numEndSecond.Value) : vodLength);
+            var videoStart = ((DateTimeOffset)DateTime.Parse(startTime.Text));
+            var videoEnd = ((DateTimeOffset)DateTime.Parse(endTime.Text));
+            vodLength = videoStart - videoEnd;
+
+            saveFileDialog.FileName = FilenameService.GetFilename(Settings.Default.TemplateChat, textTitle.Text, downloadId, DateTime.Parse(startTime.Text).ToUniversalTime(), textStreamer.Text, TimeSpan.Zero, vodLength);
 
             if (saveFileDialog.ShowDialog() != true)
             {
@@ -473,28 +204,8 @@ namespace TwitchDownloaderWPF
             try
             {
                 ChatDownloadOptions downloadOptions = GetOptions(saveFileDialog.FileName);
-                if (downloadType == DownloadType.Video)
-                {
-                    if (checkCropStart.IsChecked == true)
-                    {
-                        downloadOptions.CropBeginning = true;
-                        TimeSpan start = new TimeSpan((int)numStartHour.Value, (int)numStartMinute.Value, (int)numStartSecond.Value);
-                        downloadOptions.CropBeginningTime = (int)start.TotalSeconds;
-                    }
-
-                    if (checkCropEnd.IsChecked == true)
-                    {
-                        downloadOptions.CropEnding = true;
-                        TimeSpan end = new TimeSpan((int)numEndHour.Value, (int)numEndMinute.Value, (int)numEndSecond.Value);
-                        downloadOptions.CropEndingTime = (int)end.TotalSeconds;
-                    }
-
-                    downloadOptions.Id = downloadId;
-                }
-                else
-                {
-                    downloadOptions.Id = downloadId;
-                }
+                downloadOptions.StartTime = startTime.Text;
+                downloadOptions.EndTime = endTime.Text;
 
                 if (radioTimestampUTC.IsChecked == true)
                     downloadOptions.TimeFormat = TimestampFormat.Utc;
@@ -505,7 +216,6 @@ namespace TwitchDownloaderWPF
 
                 ChatDownloader currentDownload = new ChatDownloader(downloadOptions);
 
-                btnGetInfo.IsEnabled = false;
                 SetEnabled(false, false);
 
                 SetImage("Images/ppOverheat.gif", true);
@@ -536,7 +246,6 @@ namespace TwitchDownloaderWPF
                         MessageBox.Show(ex.ToString(), Translations.Strings.VerboseErrorOutput, MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
-                btnGetInfo.IsEnabled = true;
                 statusProgressBar.Value = 0;
                 _cancellationTokenSource.Dispose();
                 UpdateActionButtons(false);
@@ -558,23 +267,6 @@ namespace TwitchDownloaderWPF
                 _cancellationTokenSource.Cancel();
             }
             catch (ObjectDisposedException) { }
-        }
-
-        private void checkCropStart_OnCheckStateChanged(object sender, RoutedEventArgs e)
-        {
-            SetEnabledCropStart((bool)checkCropStart.IsChecked);
-        }
-
-        private void checkCropEnd_OnCheckStateChanged(object sender, RoutedEventArgs e)
-        {
-            SetEnabledCropEnd((bool)checkCropEnd.IsChecked);
-        }
-
-
-        private void MenuItemEnqueue_Click(object sender, RoutedEventArgs e)
-        {
-            WindowQueueOptions queueOptions = new WindowQueueOptions(this);
-            queueOptions.ShowDialog();
         }
     }
 }
