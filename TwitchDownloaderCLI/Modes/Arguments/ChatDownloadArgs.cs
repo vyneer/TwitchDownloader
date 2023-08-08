@@ -7,10 +7,13 @@ namespace TwitchDownloaderCLI.Modes.Arguments
     [Verb("chatdownload", HelpText = "Downloads the chat from a VOD or clip")]
     public class ChatDownloadArgs
     {
-        [Option('s', "startTime", Required = true, HelpText = "Chat start time.")]
+        [Option('u', "url", Required = false, HelpText = "Stream URL.")]
+        public string URL { get; set; }
+
+        [Option('s', "startTime", Required = false, HelpText = "Chat start time.")]
         public string StartTime { get; set; }
 
-        [Option('e', "endTime", Required = true, HelpText = "Chat end time.")]
+        [Option('e', "endTime", Required = false, HelpText = "Chat end time.")]
         public string EndTime { get; set; }
 
         [Option('o', "output", Required = true, HelpText = "Path to output file. File extension will be used to determine download type. Valid extensions are: .json, .html, and .txt.")]

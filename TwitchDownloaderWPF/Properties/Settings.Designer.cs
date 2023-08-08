@@ -493,7 +493,7 @@ namespace TwitchDownloaderWPF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("fuck,shit,cunt,whore,bitch,faggot,fag,nigger,nigga,gusano,cracker,rape")]
         public string BannedWordsList {
             get {
                 return ((string)(this["BannedWordsList"]));
@@ -721,7 +721,7 @@ namespace TwitchDownloaderWPF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("36")]
+        [global::System.Configuration.DefaultSettingValueAttribute("18")]
         public float FontSize {
             get {
                 return ((float)(this["FontSize"]));
@@ -745,7 +745,7 @@ namespace TwitchDownloaderWPF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1800")]
+        [global::System.Configuration.DefaultSettingValueAttribute("900")]
         public int Height {
             get {
                 return ((int)(this["Height"]));
@@ -757,7 +757,7 @@ namespace TwitchDownloaderWPF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1200")]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
         public int Width {
             get {
                 return ((int)(this["Width"]));

@@ -120,7 +120,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="BannedWordsList" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">fuck,shit,cunt,whore,bitch,faggot,fag,nigger,nigga,gusano,cracker,rape</Value>
     </Setting>
     <Setting Name="BadgeScale" Type="System.Double" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -177,16 +177,16 @@
       <Value Profile="(Default)">Roboto</Value>
     </Setting>
     <Setting Name="FontSize" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">36</Value>
+      <Value Profile="(Default)">18</Value>
     </Setting>
     <Setting Name="Outline" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Height" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1800</Value>
+      <Value Profile="(Default)">900</Value>
     </Setting>
     <Setting Name="Width" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1200</Value>
+      <Value Profile="(Default)">600</Value>
     </Setting>
     <Setting Name="UpdateTime" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.1</Value>

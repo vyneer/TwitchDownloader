@@ -35,6 +35,8 @@
         </Grid.RowDefinitions>
         <!-- LEFT -->
         <StackPanel Margin="0,21,0,0" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2">
+            <TextBlock Margin="3,8,3,3" Text="{lex:Loc StreamURL}" Foreground="{DynamicResource AppText}" />
+            <TextBox x:Name="streamURL" Margin="3" MinWidth="180" MaxWidth="400" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" Width="170" />
             <Border BorderBrush="{DynamicResource AppElementBorder}" BorderThickness="1">
                 <Image Stretch="Fill" StretchDirection="Both" x:Name="imgThumbnail" MinHeight="100"/>
             </Border>
@@ -43,16 +45,13 @@
                 <TextBlock Margin="3" x:Name="textStreamer" Foreground="{DynamicResource AppText}" />
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
-                <TextBlock Margin="0,3,3,3" Text="{lex:Loc VideoCreatedAt}" Foreground="{DynamicResource AppText}" />
-                <TextBlock Margin="3" x:Name="textCreatedAt" Foreground="{DynamicResource AppText}" />
-            </WrapPanel>
-            <WrapPanel Orientation="Horizontal">
                 <TextBlock Margin="0,3,3,3" Text="{lex:Loc VideoTitle}" Foreground="{DynamicResource AppText}" />
             </WrapPanel>
             <emoji:TextBlock TextWrapping="Wrap" x:Name="textTitle" Foreground="{DynamicResource AppText}" />
+            <Button x:Name="PullInfo" Height="40" Width="120" Content="{lex:Loc PullInfo}" Click="PullInfo_Click" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}" Margin="0,20,0,0" />
         </StackPanel>
         <!-- MIDDLE -->
-        <WrapPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Margin="0,0,0,10" Orientation="Horizontal" HorizontalAlignment="Center">
+        <WrapPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Margin="0,0,0,10" Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBlock Margin="3,8,3,3" Text="{lex:Loc StartTime}" Foreground="{DynamicResource AppText}" />
             <TextBox x:Name="startTime" Margin="3" MinWidth="200" MaxWidth="400" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
             <TextBlock Margin="3,8,3,3" Text="{lex:Loc EndTime}" Foreground="{DynamicResource AppText}" />
@@ -61,25 +60,16 @@
         <StackPanel Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
             <StackPanel HorizontalAlignment="Left">
                 <TextBlock Visibility="Visible" x:Name="compressionText" Text="{lex:Loc ChatCompression}" HorizontalAlignment="Right" Margin="0,15,0,0" Foreground="{DynamicResource AppText}" />
-                <TextBlock Visibility="Collapsed" x:Name="timeText" Text="{lex:Loc TimestampFormat}" HorizontalAlignment="Right" Margin="0,15,0,0" Foreground="{DynamicResource AppText}" />
-                <TextBlock HorizontalAlignment="Right" Text="{lex:Loc DownloadConnections}" Margin="0,14,0,0" Foreground="{DynamicResource AppText}" />
             </StackPanel>
             <StackPanel>
                 <StackPanel Visibility="Visible" x:Name="compressionOptions" Margin="5,8,0,0" Orientation="Horizontal">
                     <RadioButton x:Name="radioCompressionNone" IsChecked="True" Content="{lex:Loc ChatCompressionNone}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
                     <RadioButton x:Name="radioCompressionGzip" Content="{lex:Loc ChatCompressionGzip}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
                 </StackPanel>
-                <StackPanel Visibility="Collapsed" x:Name="timeOptions" Margin="5,8,0,0" Orientation="Horizontal">
-                    <RadioButton x:Name="radioTimestampUTC" IsChecked="True" Content="{lex:Loc TimestampUtc}" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                    <RadioButton x:Name="radioTimestampRelative" Content="{lex:Loc TimestampRelative}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                    <RadioButton x:Name="radioTimestampNone" Content="{lex:Loc TimestampNone}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
-                </StackPanel>
-                <hc:NumericUpDown Margin="5,8,0,0" Minimum="1" Value="1" x:Name="numChatDownloadConnections" HorizontalAlignment="Left" ValueChanged="numChatDownloadConnections_ValueChanged" Background="{DynamicResource AppElementBackground}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom">
-            <hc:SplitButton x:Name="SplitBtnDownload" Height="40" Width="120" Content="{lex:Loc Download}" Click="SplitBtnDownload_Click" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}" >
-            </hc:SplitButton>
+            <Button x:Name="SplitBtnDownload" Height="40" Width="120" Content="{lex:Loc Download}" Click="SplitBtnDownload_Click" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}" />
             <Button x:Name="BtnCancel" Height="40" MinWidth="120" Margin="0,6,0,0" Content="{lex:Loc TaskCancel}" Click="BtnCancel_Click" Visibility="Collapsed" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}"/>
         </StackPanel>
         <!-- RIGHT -->

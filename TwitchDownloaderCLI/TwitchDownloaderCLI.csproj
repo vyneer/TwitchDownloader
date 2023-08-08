@@ -14,6 +14,7 @@
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.3" />
     <PackageReference Include="Xabe.FFmpeg.Downloader" Version="5.2.6" />
+    <PackageReference Include="YoutubeDLSharp" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

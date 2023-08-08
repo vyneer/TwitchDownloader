@@ -1,8 +1,11 @@
-﻿using Microsoft.Win32;
+﻿using HandyControl.Tools.Extension;
+using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.IO;
+using System.Management;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +20,7 @@ using TwitchDownloaderCore.TwitchObjects.Gql;
 using TwitchDownloaderWPF.Properties;
 using TwitchDownloaderWPF.Services;
 using WpfAnimatedGif;
+using YoutubeDLSharp;
 
 namespace TwitchDownloaderWPF
 {
@@ -42,14 +46,11 @@ namespace TwitchDownloaderWPF
         private void Page_Initialized(object sender, EventArgs e)
         {
             SetEnabled(true, false);
-            numChatDownloadConnections.Value = Settings.Default.ChatDownloadThreads;
         }
 
         private void SetEnabled(bool isEnabled, bool isClip)
         {
-            radioTimestampRelative.IsEnabled = isEnabled;
-            radioTimestampUTC.IsEnabled = isEnabled;
-            radioTimestampNone.IsEnabled = isEnabled;
+            PullInfo.IsEnabled = isEnabled;
             radioCompressionNone.IsEnabled = isEnabled;
             radioCompressionGzip.IsEnabled = isEnabled;
             SplitBtnDownload.IsEnabled = isEnabled;
@@ -59,10 +60,12 @@ namespace TwitchDownloaderWPF
         {
             if (isDownloading)
             {
+                PullInfo.Visibility = Visibility.Collapsed;
                 SplitBtnDownload.Visibility = Visibility.Collapsed;
                 BtnCancel.Visibility = Visibility.Visible;
                 return;
             }
+            PullInfo.Visibility = Visibility.Visible;
             SplitBtnDownload.Visibility = Visibility.Visible;
             BtnCancel.Visibility = Visibility.Collapsed;
         }
@@ -95,7 +98,6 @@ namespace TwitchDownloaderWPF
 
             options.EmbedData = true;
             options.Filename = filename;
-            options.ConnectionCount = (int)numChatDownloadConnections.Value;
             return options;
         }
 
@@ -153,8 +155,6 @@ namespace TwitchDownloaderWPF
         {
             if (this.IsInitialized)
             {
-                numChatDownloadConnections.Value = Math.Clamp((int)numChatDownloadConnections.Value, 1, 50);
-                Settings.Default.ChatDownloadThreads = (int)numChatDownloadConnections.Value;
                 Settings.Default.Save();
             }
         }
@@ -177,13 +177,43 @@ namespace TwitchDownloaderWPF
             }
         }
 
+        private async void PullInfo_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!File.Exists("yt-dlp.exe"))
+                {
+                    AppendLog("[STATUS] - Installing yt-dlp");
+                    await YoutubeDLSharp.Utils.DownloadYtDlp();
+                    AppendLog("[STATUS] - yt-dlp installed");
+                }
+                var ytdl = new YoutubeDL();
+                var res = await ytdl.RunVideoDataFetch(streamURL.Text);
+                AppendLog("[STATUS] - Loading info...");
+                YoutubeDLSharp.Metadata.VideoData video = res.Data;
+                if (video.WasLive.Value)
+                {
+                    textStreamer.Text = video.Uploader;
+                    textTitle.Text = video.Title;
+                    imgThumbnail.Source = await ThumbnailService.GetThumb(video.Thumbnail);
+                    var st = video.ReleaseTimestamp?.ToUniversalTime();
+                    startTime.Text = st?.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    endTime.Text = (st?.AddSeconds((double)video.Duration.Value))?.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    AppendLog("[STATUS] - Loaded info successfully...");
+                }
+                else
+                {
+                    AppendLog("[ERROR] - Invalid video");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendLog(Translations.Strings.ErrorLog + ex.Message);
+            }
+        }
+
         private async void SplitBtnDownload_Click(object sender, RoutedEventArgs e)
         {
-            if (((HandyControl.Controls.SplitButton)sender).IsDropDownOpen)
-            {
-                return;
-            }
-
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             if (radioCompressionNone.IsChecked == true)
                 saveFileDialog.Filter = "JSON Files | *.json";
@@ -206,13 +236,6 @@ namespace TwitchDownloaderWPF
                 ChatDownloadOptions downloadOptions = GetOptions(saveFileDialog.FileName);
                 downloadOptions.StartTime = startTime.Text;
                 downloadOptions.EndTime = endTime.Text;
-
-                if (radioTimestampUTC.IsChecked == true)
-                    downloadOptions.TimeFormat = TimestampFormat.Utc;
-                else if (radioTimestampRelative.IsChecked == true)
-                    downloadOptions.TimeFormat = TimestampFormat.Relative;
-                else if (radioTimestampNone.IsChecked == true)
-                    downloadOptions.TimeFormat = TimestampFormat.None;
 
                 ChatDownloader currentDownload = new ChatDownloader(downloadOptions);
 
@@ -249,6 +272,7 @@ namespace TwitchDownloaderWPF
                 statusProgressBar.Value = 0;
                 _cancellationTokenSource.Dispose();
                 UpdateActionButtons(false);
+                SetEnabled(true, false);
 
                 currentDownload = null;
                 GC.Collect();
