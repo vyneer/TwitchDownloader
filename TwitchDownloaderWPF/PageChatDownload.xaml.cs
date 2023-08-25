@@ -21,6 +21,8 @@ using TwitchDownloaderWPF.Properties;
 using TwitchDownloaderWPF.Services;
 using WpfAnimatedGif;
 using YoutubeDLSharp;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace TwitchDownloaderWPF
 {
@@ -181,29 +183,60 @@ namespace TwitchDownloaderWPF
         {
             try
             {
-                if (!File.Exists("yt-dlp.exe"))
+                if (!streamURL.Text.Contains("kick.com/video/"))
                 {
-                    AppendLog("[STATUS] - Installing yt-dlp");
-                    await YoutubeDLSharp.Utils.DownloadYtDlp();
-                    AppendLog("[STATUS] - yt-dlp installed");
-                }
-                var ytdl = new YoutubeDL();
-                var res = await ytdl.RunVideoDataFetch(streamURL.Text);
-                AppendLog("[STATUS] - Loading info...");
-                YoutubeDLSharp.Metadata.VideoData video = res.Data;
-                if (video.WasLive.Value)
-                {
-                    textStreamer.Text = video.Uploader;
-                    textTitle.Text = video.Title;
-                    imgThumbnail.Source = await ThumbnailService.GetThumb(video.Thumbnail);
-                    var st = video.ReleaseTimestamp?.ToUniversalTime();
-                    startTime.Text = st?.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                    endTime.Text = (st?.AddSeconds((double)video.Duration.Value))?.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                    AppendLog("[STATUS] - Loaded info successfully...");
+                    if (!File.Exists("yt-dlp.exe"))
+                    {
+                        AppendLog("[STATUS] - Installing yt-dlp");
+                        await YoutubeDLSharp.Utils.DownloadYtDlp();
+                        AppendLog("[STATUS] - yt-dlp installed");
+                    }
+                    var ytdl = new YoutubeDL();
+                    var res = await ytdl.RunVideoDataFetch(streamURL.Text);
+                    AppendLog("[STATUS] - Loading info...");
+                    YoutubeDLSharp.Metadata.VideoData video = res.Data;
+                    if (video.WasLive.Value)
+                    {
+                        textStreamer.Text = video.Uploader;
+                        textTitle.Text = video.Title;
+                        imgThumbnail.Source = await ThumbnailService.GetThumb(video.Thumbnail);
+                        var st = video.ReleaseTimestamp?.ToUniversalTime();
+                        startTime.Text = st?.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                        endTime.Text = (st?.AddSeconds((double)video.Duration.Value))?.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                        AppendLog("[STATUS] - Loaded info successfully...");
+                    }
+                    else
+                    {
+                        AppendLog("[ERROR] - Invalid video");
+                    }
                 }
                 else
                 {
-                    AppendLog("[ERROR] - Invalid video");
+                    var headers = new Dictionary<string, string>(){
+                        { "accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" },
+                        { "accept-language", "en-US,en;q=0.5" },
+                        { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36" }
+                    };
+                    var kick = new KickService(headers);
+                    var kickVodSplit = streamURL.Text.Split("/");
+                    var kickVodId = kickVodSplit[^1];
+                    var result = kick.Get($"https://kick.com/api/v1/video/{kickVodId}");
+                    if (result.Status == 200)
+                    {
+                        var video = JsonConvert.DeserializeObject<KickVideoResponse>(result.Body);
+                        textStreamer.Text = video.Livestream.Channel.Name;
+                        textTitle.Text = video.Livestream.Title;
+                        var thumbSplit = video.Source.Split("/");
+                        imgThumbnail.Source = await ThumbnailService.GetThumb($"https://images.kick.com/video_thumbnails/{thumbSplit[6]}/{thumbSplit[12]}/720.webp");
+                        var st = DateTime.ParseExact(video.Livestream.CreatedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        startTime.Text = st.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                        endTime.Text = (st.AddMilliseconds((double)video.Livestream.Duration)).ToString("yyyy-MM-ddTHH:mm:ssZ");
+                        AppendLog("[STATUS] - Loaded info successfully...");
+                    }
+                    else
+                    {
+                        AppendLog($"[ERROR] - HTTP error {result.Status}");
+                    }
                 }
             }
             catch (Exception ex)
