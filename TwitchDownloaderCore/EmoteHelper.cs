@@ -17,7 +17,7 @@ namespace TwitchDownloaderCore
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public static async Task<List<DGGEmote>> GetDGGEmoteData(string tempFolder, IProgress<ProgressReport> progress, CancellationToken cancellationToken = new())
+        public static async Task<List<DGGEmote>> GetDGGEmoteData(string tempFolder, bool webp, IProgress<ProgressReport> progress, CancellationToken cancellationToken = new())
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -194,17 +194,44 @@ namespace TwitchDownloaderCore
 
 						var imageCollection = new MagickImageCollection();
 						var imageCounter = 0;
+						Process ffmpeg = new Process();
+						if (webp)
+						{
+							var framerate = (int)Math.Round(fq.Count / dur);
+							framerate = framerate == 0 ? 1 : framerate;
+							ffmpeg.StartInfo.FileName = @"ffmpeg.exe";
+							ffmpeg.StartInfo.Arguments = $"-loglevel error -f png_pipe -r {framerate} -i - -y -an -r 60 -vcodec libwebp_anim -loop 1 -q:v 100 -lossless 1 -threads 1 {tempFolder}\\dggEmotes\\{item.prefix}.webp";
+							ffmpeg.StartInfo.UseShellExecute = false;
+							ffmpeg.StartInfo.RedirectStandardInput = true;
+							// ffmpeg.StartInfo.RedirectStandardOutput = true;
+							ffmpeg.Start();
+						}
 						while (fq.Count > 0)
 						{
-							var img = new MagickImage(fq.Dequeue());
-							imageCollection.Add(img);
-							imageCollection[imageCounter].AnimationIterations = 1;
-							imageCollection[imageCounter].AnimationDelay = Math.Max(2, frameDelays[imageCounter]);
-							imageCollection[imageCounter].GifDisposeMethod = imageCounter == 0 ? GifDisposeMethod.None : GifDisposeMethod.Background;
-							imageCounter++;
+							if (webp)
+							{
+								ffmpeg.StandardInput.BaseStream.Write(fq.Dequeue());
+							}
+							else
+							{
+								var img = new MagickImage(fq.Dequeue());
+								imageCollection.Add(img);
+								imageCollection[imageCounter].AnimationIterations = 1;
+								imageCollection[imageCounter].AnimationDelay = Math.Max(2, frameDelays[imageCounter]);
+								imageCollection[imageCounter].GifDisposeMethod = imageCounter == 0 ? GifDisposeMethod.None : GifDisposeMethod.Background;
+								imageCounter++;
+							}
 						}
 
-						imageCollection.Write($"{tempFolder}/dggEmotes/{item.prefix}.gif");
+						if (webp)
+						{
+							ffmpeg.StandardInput.Close();
+							ffmpeg.WaitForExit();
+							ffmpeg.Dispose();
+						} else {
+							imageCollection.Write($"{tempFolder}/dggEmotes/{item.prefix}.gif");
+						}
+
 						cdp.MessageReceived -= handler;
 					} else {
 						using (var client = new HttpClient())

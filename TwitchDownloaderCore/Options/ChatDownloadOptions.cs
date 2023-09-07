@@ -25,5 +25,6 @@ namespace TwitchDownloaderCore.Options
             }
         }
         public string TempFolder { get; set; }
+        public bool WebpEmotes { get; set; }
     }
 }

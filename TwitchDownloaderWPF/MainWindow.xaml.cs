@@ -67,8 +67,8 @@ namespace TwitchDownloaderWPF
                 }
             }
 
-            Version currentVersion = new Version("1.53.0");
-            Title = $"Twitch Downloader v{currentVersion}";
+            Version currentVersion = new Version("0.1.0");
+            Title = $"DGG Downloader v{currentVersion}";
 #if !DEBUG
             if (AppContext.BaseDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
             {

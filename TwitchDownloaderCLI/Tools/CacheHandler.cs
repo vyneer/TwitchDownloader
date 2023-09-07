@@ -44,7 +44,7 @@ namespace TwitchDownloaderCLI.Tools
 
         private static void ClearTempCache()
         {
-            var defaultCacheDirectory = Path.Combine(Path.GetTempPath(), "TwitchDownloader");
+            var defaultCacheDirectory = Path.Combine(Path.GetTempPath(), "DGGDownloader");
             if (Directory.Exists(defaultCacheDirectory))
             {
                 Console.WriteLine("Clearing cache...");

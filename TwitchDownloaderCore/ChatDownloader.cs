@@ -27,7 +27,7 @@ namespace TwitchDownloaderCore
             downloadOptions = DownloadOptions;
             downloadOptions.TempFolder = Path.Combine(
                 string.IsNullOrWhiteSpace(downloadOptions.TempFolder) ? Path.GetTempPath() : downloadOptions.TempFolder,
-                "TwitchDownloader");
+                "DGGDownloader");
         }
 
         private static async Task DownloadSection(string chatStart, string chatEnd, List<DGGEmote> emotes, SortedSet<Comment> comments, object commentLock, IProgress<ProgressReport> progress, CancellationToken cancellationToken)
@@ -225,7 +225,7 @@ namespace TwitchDownloaderCore
                 progress.Report(new ProgressReport() { ReportType = ReportType.NewLineStatus, Data = "Downloading + Embedding Images" });
                 chatRoot.embeddedData = new EmbeddedData();
 
-                dggEmotes = await EmoteHelper.GetDGGEmoteData(downloadOptions.TempFolder, progress, cancellationToken: cancellationToken);
+                dggEmotes = await EmoteHelper.GetDGGEmoteData(downloadOptions.TempFolder, downloadOptions.WebpEmotes, progress, cancellationToken: cancellationToken);
 
                 cancellationToken.ThrowIfCancellationRequested();
 

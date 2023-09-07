@@ -16,6 +16,11 @@ namespace TwitchDownloaderCLI.Modes
     {
         internal static void Download(ChatDownloadArgs inputOptions)
         {
+            if (inputOptions.WebpEmotes)
+            {
+                FfmpegHandler.DetectFfmpeg(inputOptions.FfmpegPath);
+            }
+
             var downloadOptions = Task.Run<ChatDownloadOptions>(async () => await GetDownloadOptionsAsync(inputOptions));
 
             ChatDownloader chatDownloader = new(downloadOptions.Result);
@@ -73,7 +78,8 @@ namespace TwitchDownloaderCLI.Modes
                 Compression = inputOptions.Compression,
                 TimeFormat = inputOptions.TimeFormat,
                 ConnectionCount = inputOptions.ChatConnections,
-                TempFolder = inputOptions.TempFolder
+                TempFolder = inputOptions.TempFolder,
+                WebpEmotes = inputOptions.WebpEmotes,
             };
 
             return downloadOptions;

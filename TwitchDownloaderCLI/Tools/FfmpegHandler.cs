@@ -52,7 +52,7 @@ namespace TwitchDownloaderCLI.Tools
                 return;
             }
 
-            Console.WriteLine("[ERROR] - Unable to find ffmpeg, exiting. You can download ffmpeg automatically with the command \"TwitchDownloaderCLI ffmpeg -d\"");
+            Console.WriteLine("[ERROR] - Unable to find ffmpeg, exiting. You can download ffmpeg automatically with the command \"DGGDownloaderCLI ffmpeg -d\"");
             Environment.Exit(1);
         }
     }

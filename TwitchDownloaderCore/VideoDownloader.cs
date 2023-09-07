@@ -27,7 +27,7 @@ namespace TwitchDownloaderCore
             downloadOptions = DownloadOptions;
             downloadOptions.TempFolder = Path.Combine(
                 string.IsNullOrWhiteSpace(downloadOptions.TempFolder) ? Path.GetTempPath() : downloadOptions.TempFolder,
-                "TwitchDownloader");
+                "DGGDownloader");
         }
 
         public async Task DownloadAsync(IProgress<ProgressReport> progress, CancellationToken cancellationToken)

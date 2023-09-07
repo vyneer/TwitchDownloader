@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RepositoryUrl>https://github.com/lay295/TwitchDownloader</RepositoryUrl>
+    <RepositoryUrl>https://github.com/vyneer/TwitchDownloader</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Authors>Lewis Pardo</Authors>
-    <Version>1.1.6</Version>
+    <Authors>Lewis Pardo, vyneer</Authors>
+    <Version>0.1.0</Version>
     <Platforms>AnyCPU;x64</Platforms>
     <LangVersion>default</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
