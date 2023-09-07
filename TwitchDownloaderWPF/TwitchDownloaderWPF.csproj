@@ -121,5 +121,6 @@
     <PostBuildEvent></PostBuildEvent>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
+    <AssemblyName>DGGDownloaderWPF</AssemblyName>
   </PropertyGroup>
 </Project>

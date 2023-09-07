@@ -34,7 +34,7 @@ namespace TwitchDownloaderCLI.Modes.Arguments
         [Option("temp-path", Default = "", HelpText = "Path to temporary folder to use for cache.")]
         public string TempFolder { get; set; }
 
-        [Option("webp-emotes", Default = true, HelpText = "Render animated emotes as webp instead of gif.")]
+        [Option("webp-emotes", Default = false, HelpText = "Render animated emotes as webp instead of gif.")]
         public bool WebpEmotes { get; set; }
 
         [Option("ffmpeg-path", HelpText = "Path to ffmpeg executable.")]

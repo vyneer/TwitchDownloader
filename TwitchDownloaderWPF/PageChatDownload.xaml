@@ -47,8 +47,8 @@
             <WrapPanel Orientation="Horizontal">
                 <TextBlock Margin="0,3,3,3" Text="{lex:Loc VideoTitle}" Foreground="{DynamicResource AppText}" />
             </WrapPanel>
-            <emoji:TextBlock TextWrapping="Wrap" x:Name="textTitle" Foreground="{DynamicResource AppText}" />
-            <Button x:Name="PullInfo" Height="40" Width="120" Content="{lex:Loc PullInfo}" Click="PullInfo_Click" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}" Margin="0,20,0,0" />
+            <emoji:TextBlock Height="30px" TextWrapping="Wrap" x:Name="textTitle" Foreground="{DynamicResource AppText}" />
+            <Button Margin="0,6,0,0" x:Name="PullInfo" Height="40" Width="120" Content="{lex:Loc PullInfo}" Click="PullInfo_Click" Background="{DynamicResource ActionButtonBackground}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource ActionButtonBorder}" />
         </StackPanel>
         <!-- MIDDLE -->
         <WrapPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Margin="0,0,0,10" Orientation="Horizontal" HorizontalAlignment="Left">
@@ -62,9 +62,20 @@
                 <TextBlock Visibility="Visible" x:Name="compressionText" Text="{lex:Loc ChatCompression}" HorizontalAlignment="Right" Margin="0,15,0,0" Foreground="{DynamicResource AppText}" />
             </StackPanel>
             <StackPanel>
-                <StackPanel Visibility="Visible" x:Name="compressionOptions" Margin="5,8,0,0" Orientation="Horizontal">
+                <StackPanel Visibility="Visible" x:Name="compressionOptions" Margin="5,14,0,0" Orientation="Horizontal">
                     <RadioButton x:Name="radioCompressionNone" IsChecked="True" Content="{lex:Loc ChatCompressionNone}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
                     <RadioButton x:Name="radioCompressionGzip" Content="{lex:Loc ChatCompressionGzip}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,60,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel HorizontalAlignment="Left">
+                <TextBlock Visibility="Visible" x:Name="emoteFormat" Text="{lex:Loc EmoteFormat}" HorizontalAlignment="Right" Margin="0,15,0,0" Foreground="{DynamicResource AppText}" />
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Visibility="Visible" x:Name="emoteFormatOptions" Margin="5,14,0,0" Orientation="Horizontal">
+                    <RadioButton x:Name="emoteFormatGif" IsChecked="True" Content="{lex:Loc EmoteFormatGif}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
+                    <RadioButton x:Name="emoteFormatWebp" Content="{lex:Loc EmoteFormatWebp}" Margin="3,0,0,0" Background="{DynamicResource AppRadio}" BorderBrush="{DynamicResource AppElementBorder}" Foreground="{DynamicResource AppText}" />
                 </StackPanel>
             </StackPanel>
         </StackPanel>
@@ -88,6 +99,7 @@
                     </Style>
                 </RichTextBox.Resources>
             </RichTextBox>
+            <Button x:Name="clearEmotes" Margin="0,10,0,0" Height="40" Width="120" Content="{lex:Loc ClearEmotes}" Click="ClearEmotesButton_Click" Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource AccentBrush}" />
         </StackPanel>
         <!--STATUS BAR-->
         <StatusBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="6" Background="{DynamicResource StatusBarBackground}" BorderBrush="{DynamicResource StatusBarBorder}">

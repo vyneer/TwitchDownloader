@@ -23,6 +23,7 @@ using WpfAnimatedGif;
 using YoutubeDLSharp;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace TwitchDownloaderWPF
 {
@@ -55,6 +56,8 @@ namespace TwitchDownloaderWPF
             PullInfo.IsEnabled = isEnabled;
             radioCompressionNone.IsEnabled = isEnabled;
             radioCompressionGzip.IsEnabled = isEnabled;
+            emoteFormatGif.IsEnabled = isEnabled;
+            emoteFormatWebp.IsEnabled = isEnabled;
             SplitBtnDownload.IsEnabled = isEnabled;
         }
 
@@ -97,6 +100,10 @@ namespace TwitchDownloaderWPF
                 options.Compression = ChatCompression.None;
             else if (radioCompressionGzip.IsChecked == true)
                 options.Compression = ChatCompression.Gzip;
+
+            if (emoteFormatWebp.IsChecked == true)
+                options.WebpEmotes = true;
+            else options.WebpEmotes = false;
 
             options.EmbedData = true;
             options.Filename = filename;
@@ -324,6 +331,26 @@ namespace TwitchDownloaderWPF
                 _cancellationTokenSource.Cancel();
             }
             catch (ObjectDisposedException) { }
+        }
+
+        private void ClearEmotesButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var emoteFolder = Path.Combine(
+                        Path.GetTempPath(),
+                        Path.Combine("DGGDownloader", "dggEmotes"));
+
+                if (Directory.Exists(emoteFolder))
+                {
+                    Directory.Delete(emoteFolder, true);
+                    AppendLog($"Cleared dgg emote folder - {emoteFolder}");
+                } else
+                {
+                    AppendLog($"No dgg emote folder found - {emoteFolder}");
+                }
+            } catch { }
+
         }
     }
 }

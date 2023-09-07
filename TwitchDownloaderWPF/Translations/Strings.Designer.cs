@@ -394,6 +394,15 @@ namespace TwitchDownloaderWPF.Translations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clear Emote Cache.
+        /// </summary>
+        public static string ClearEmotes {
+            get {
+                return ResourceManager.GetString("ClearEmotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clip Download.
         /// </summary>
         public static string ClipDownload {
@@ -633,6 +642,33 @@ namespace TwitchDownloaderWPF.Translations {
         public static string EmojiVendorTwemoji {
             get {
                 return ResourceManager.GetString("EmojiVendorTwemoji", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Emote Format.
+        /// </summary>
+        public static string EmoteFormat {
+            get {
+                return ResourceManager.GetString("EmoteFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .gif.
+        /// </summary>
+        public static string EmoteFormatGif {
+            get {
+                return ResourceManager.GetString("EmoteFormatGif", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .webp.
+        /// </summary>
+        public static string EmoteFormatWebp {
+            get {
+                return ResourceManager.GetString("EmoteFormatWebp", resourceCulture);
             }
         }
         

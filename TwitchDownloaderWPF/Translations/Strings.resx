@@ -775,4 +775,16 @@
   <data name="StreamURL" xml:space="preserve">
     <value>Stream URL:</value>
   </data>
+  <data name="ClearEmotes" xml:space="preserve">
+    <value>Clear Emote Cache</value>
+  </data>
+  <data name="EmoteFormat" xml:space="preserve">
+    <value>Emote Format</value>
+  </data>
+  <data name="EmoteFormatGif" xml:space="preserve">
+    <value>.gif</value>
+  </data>
+  <data name="EmoteFormatWebp" xml:space="preserve">
+    <value>.webp</value>
+  </data>
 </root>
