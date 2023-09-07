@@ -13,10 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\interbold.otf" />
-    <EmbeddedResource Include="Resources\interregular.otf" />
     <EmbeddedResource Include="Resources\template.html" />
     <EmbeddedResource Include="Resources\noto-emoji-2.038.zip" />
+    <EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
+    <EmbeddedResource Include="Resources\Roboto-Medium.ttf" />
   </ItemGroup>
 
   <ItemGroup>

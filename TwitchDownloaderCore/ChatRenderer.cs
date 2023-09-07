@@ -78,10 +78,10 @@ namespace TwitchDownloaderCore
             nameFont = new SKPaint() { LcdRenderText = true, SubpixelText = true, TextSize = (float)renderOptions.FontSize, IsAntialias = true, IsAutohinted = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High };
             messageFont = new SKPaint() { LcdRenderText = true, SubpixelText = true, TextSize = (float)renderOptions.FontSize, IsAntialias = true, IsAutohinted = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High, Color = renderOptions.MessageColor };
 
-            if (renderOptions.Font == "Inter Embedded")
+            if (renderOptions.Font == "Roboto")
             {
-                nameFont.Typeface = GetInterTypeface(renderOptions.UsernameFontStyle);
-                messageFont.Typeface = GetInterTypeface(renderOptions.MessageFontStyle);
+                nameFont.Typeface = GetRobotoTypeface(renderOptions.UsernameFontStyle);
+                messageFont.Typeface = GetRobotoTypeface(renderOptions.MessageFontStyle);
             }
             else
             {
@@ -233,16 +233,16 @@ namespace TwitchDownloaderCore
             }
         }
 
-        private static SKTypeface GetInterTypeface(SKFontStyle fontStyle)
+        private static SKTypeface GetRobotoTypeface(SKFontStyle fontStyle)
         {
             if (fontStyle == SKFontStyle.Bold)
             {
-                using MemoryStream stream = new MemoryStream(Properties.Resources.InterBold);
+                using MemoryStream stream = new MemoryStream(Properties.Resources.RobotoMedium);
                 return SKTypeface.FromStream(stream);
             }
             else
             {
-                using MemoryStream stream = new MemoryStream(Properties.Resources.Inter);
+                using MemoryStream stream = new MemoryStream(Properties.Resources.Roboto);
                 return SKTypeface.FromStream(stream);
             }
         }

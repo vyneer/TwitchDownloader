@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using PuppeteerSharp;
 using ImageMagick;
 using TwitchDownloaderCore.DGGObjects;
@@ -40,7 +41,7 @@ namespace TwitchDownloaderCore
 						premadeEmotes++;
 					}
 				}
-				htmlBody += $@"<div class=""emote {item.prefix}"" style=""display: none;""></div>";
+				htmlBody += $@"<div class=""emote {item.prefix}""></div>";
 			}
 
 			progress.Report(new ProgressReport(ReportType.NewLineStatus, "Downloading headless Chromium"));
@@ -56,6 +57,7 @@ namespace TwitchDownloaderCore
   						<link rel=""stylesheet"" href=""https://cdn.destiny.gg/flairs/flairs.css"">";
 			
 			await page.SetContentAsync($"<!DOCTYPE html><html><head>{htmlHeader}</head><body style='margin: 0;'>{htmlBody}</body></html>");
+			Thread.Sleep(10000);
 
 			var cdp = await page.Target.CreateCDPSessionAsync();
 
@@ -80,118 +82,108 @@ namespace TwitchDownloaderCore
 				foreach (var item in DGGEmotes)
 				{
 					var fileType = item.image[0].url.Substring(item.image[0].url.Length - 3);
-					if (Directory.Exists($"{tempFolder}/dggEmotes/temp-{item.prefix}"))
-					{
-						Directory.Delete($"{tempFolder}/dggEmotes/temp-{item.prefix}", true);
-					}
-					Directory.CreateDirectory($"{tempFolder}/dggEmotes/temp-{item.prefix}");
 					var width = await page.EvaluateExpressionAsync<decimal>($"(() => {{return parseFloat(window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('width').slice(0, -2)) + parseInt(window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('margin-right').slice(0, -2))}})()");
 					var height = await page.EvaluateExpressionAsync<decimal>($"(() => {{return parseFloat(window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('height').slice(0, -2))}})()");
 					var animationDuration = await page.EvaluateExpressionAsync<double>($@"(() => {{
-          									const dur = window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('animation-duration').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0)
-          									const iter = window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('animation-iteration-count').split(',').reduce((acc, cur) => acc + parseFloat(cur), 0)
-          									const delay = window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('animation-delay').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0)
-          									return (dur * iter) + (delay < 0 ? 0 : delay)
+          									const durArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('animation-duration').split(',');
+											const iterArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('animation-iteration-count').split(',');
+											const dur = durArray.reduce((acc, cur, index) => {{
+												if (iterArray.length === durArray.length) {{
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[index]));
+												}} else if (iterArray.length === 1) {{
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[0]));
+												}} else {{
+													return acc + (parseFloat(cur.slice(0, -1)));
+												}}
+											}}, 0);
+          									const delay = window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('animation-delay').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0);
+          									return dur + (delay < 0 ? 0 : delay);
         								}})()");
 					var animationDurationBefore = await page.EvaluateExpressionAsync<double>($@"(() => {{
-          									const dur = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::before').getPropertyValue('animation-duration').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0)
-          									const iter = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::before').getPropertyValue('animation-iteration-count').split(',').reduce((acc, cur) => acc + parseFloat(cur), 0)
-          									const delay = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::before').getPropertyValue('animation-delay').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0)
-          									return (dur * iter) + (delay < 0 ? 0 : delay)
+          									const durArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::before').getPropertyValue('animation-duration').split(',');
+											const iterArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::before').getPropertyValue('animation-iteration-count').split(',');
+											const dur = durArray.reduce((acc, cur, index) => {{
+												if (iterArray.length === durArray.length) {{
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[index]));
+												}} else if (iterArray.length === 1) {{
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[0]));
+												}} else {{
+													return acc + (parseFloat(cur.slice(0, -1)));
+												}}
+											}}, 0);
+          									const delay = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::before').getPropertyValue('animation-delay').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0);
+          									return dur + (delay < 0 ? 0 : delay);
         								}})()");
 					var animationDurationAfter = await page.EvaluateExpressionAsync<double>($@"(() => {{
-          									const dur = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::after').getPropertyValue('animation-duration').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0)
-          									const iter = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::after').getPropertyValue('animation-iteration-count').split(',').reduce((acc, cur) => acc + parseFloat(cur), 0)
-          									const delay = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::after').getPropertyValue('animation-delay').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0)
-          									return (dur * iter) + (delay < 0 ? 0 : delay)
+          									const durArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::after').getPropertyValue('animation-duration').split(',');
+											const iterArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::after').getPropertyValue('animation-iteration-count').split(',');
+											const dur = durArray.reduce((acc, cur, index) => {{
+												if (iterArray.length === durArray.length) {{
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[index]));
+												}} else if (iterArray.length === 1) {{
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[0]));
+												}} else {{
+													return acc + (parseFloat(cur.slice(0, -1)));
+												}}
+											}}, 0);
+          									const delay = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::after').getPropertyValue('animation-delay').split(',').reduce((acc, cur) => acc + parseFloat(cur.slice(0, -1)), 0);
+          									return dur + (delay < 0 ? 0 : delay);
         								}})()");
 					var dur = animationDuration + animationDurationAfter + animationDurationBefore;
 
+					var backgroundPosition = await page.EvaluateExpressionAsync<bool>($@"(() => {{
+          									return window.getComputedStyle(document.querySelector('.{item.prefix}')).getPropertyValue('background-position').split(' ')[0] !== '0%' 
+        								}})()");
+
 					if (dur != 0)
 					{
-						await page.EvaluateExpressionAsync($@"(() => {{
-								const emote = document.querySelector('.{item.prefix}')
-								emote.style.display = ''
-							}})()");
-						Thread.Sleep(1000);
-
-						await page.EvaluateExpressionAsync($@"(() => {{
-								const emote = document.querySelector('.{item.prefix}')
-								emote.style.display = 'none'
-							}})()");
-
-						await page.EvaluateExpressionAsync($@"(() => {{
-								const emote = document.querySelector('.{item.prefix}')
-								emote.style.display = ''
-							}})()");
-						// Thread.Sleep(10);
-
-						var screenshotI = 0;
-						// List<long> swCounter = new List<long>();
-						// var sw = new System.Diagnostics.Stopwatch();
 						var durMs = dur * 1000;
 						var date = DateTime.Now;
 
-						EventHandler<MessageEventArgs> handler = async (sender, e) => {
+						Queue<byte[]> fq = new Queue<byte[]>();
+						var frameDelays = new List<int>();
+						Stopwatch sw = new Stopwatch();
+
+                        EventHandler<MessageEventArgs> handler = async (sender, e) => {
 							if (e.MessageID == "Page.screencastFrame")
 							{
-								screenshotI++;
-								var numberString = screenshotI.ToString().PadLeft(4, '0');
-								// sw.Start();
-								File.WriteAllBytes($"{tempFolder}/dggEmotes/temp-{item.prefix}/{numberString}.png", Convert.FromBase64String(e.MessageData.Value<string>("data")));
-								// Console.WriteLine(e.MessageData.ToString());
-								// await page.ScreenshotAsync($"{tempFolder}/dggEmotes/temp-{item.prefix}/{numberString}.png", new ScreenshotOptions
-								// {
-								// 	Clip = new PuppeteerSharp.Media.Clip {
-								// 		X = 8,
-								// 		Y = 8,
-								// 		Width = width,
-								// 		Height = height,
-								// 	},
-								// 	OmitBackground = true,
-								// });
-								// sw.Stop();
-								// swCounter.Add(sw.ElapsedMilliseconds);
 								await cdp.SendAsync("Page.screencastFrameAck", new {
 									sessionId = e.MessageData.Value<int>("sessionId"),
 								});
+								sw.Stop();
+								var frame = Convert.FromBase64String(e.MessageData.Value<string>("data"));
+								fq.Enqueue(frame);
+								frameDelays.Add((int)sw.ElapsedMilliseconds / 10);
+								sw.Reset();
+								sw.Start();
 							}
 						};
 
 						cdp.MessageReceived += handler;
 
 						await page.SetViewportAsync(new ViewPortOptions{
-							Width = ((int)width),
-							Height = ((int)height),
+							Width = (int)width,
+							Height = (int)height,
 						});
+
+						await page.EvaluateExpressionAsync($@"(() => {{
+								document.querySelectorAll('.emote').forEach(e => e.style.display = 'none');
+							}})()");
+
+						await page.EvaluateExpressionAsync($@"(() => {{
+								const emote = document.querySelector('.{item.prefix}');
+								emote.style.display = '';
+							}})()");
+						
+						Thread.Sleep(20);
 
 						await cdp.SendAsync("Page.startScreencast", new {
 							everyNthFrame = 1,
 							format = "png",
 							quality = 100,
-							// maxWidth = width,
-							// maxHeight = height,
 						});
 
-						Thread.Sleep(((int)durMs));
-						// while ((DateTime.Now - date).TotalMilliseconds < durMs)
-						// {
-						// 	// screenshotI++;
-						// 	// var numberString = screenshotI.ToString().PadLeft(4, '0');
-						// 	// sw.Start();
-						// 	// await page.ScreenshotAsync($"{tempFolder}/dggEmotes/temp-{item.prefix}/{numberString}.png", new ScreenshotOptions
-						// 	// {
-						// 	// 	Clip = new PuppeteerSharp.Media.Clip {
-						// 	// 		X = 8,
-						// 	// 		Y = 8,
-						// 	// 		Width = width,
-						// 	// 		Height = height,
-						// 	// 	},
-						// 	// 	OmitBackground = true,
-						// 	// });
-						// 	// sw.Stop();
-						// 	// swCounter.Add(sw.ElapsedMilliseconds);
-						// }
+						Thread.Sleep((int)durMs);
 
 						await cdp.SendAsync("Page.stopScreencast");
 
@@ -202,18 +194,12 @@ namespace TwitchDownloaderCore
 
 						var imageCollection = new MagickImageCollection();
 						var imageCounter = 0;
-						var images = Directory.GetFiles($"{tempFolder}/dggEmotes/temp-{item.prefix}/").OrderBy(f => f);
-						// var delay = ((int)Math.Round(images.Count() / (dur * 10)));
-						foreach (var frame in images)
+						while (fq.Count > 0)
 						{
-							var img = new MagickImage(frame);
-							// img.Alpha(AlphaOption.Set);
-							// img.ColorFuzz = new Percentage(5);
-							// img.Opaque(MagickColor.FromRgb(0, 210, 13), MagickColors.None);
+							var img = new MagickImage(fq.Dequeue());
 							imageCollection.Add(img);
 							imageCollection[imageCounter].AnimationIterations = 1;
-							imageCollection[imageCounter].AnimationDelay = 3;
-							// imageCollection[imageCounter].AnimationDelay = imageCounter == 0 ? 0 : ((int)Math.Floor(((swCounter[imageCounter] - swCounter[imageCounter-1])/10.0)));
+							imageCollection[imageCounter].AnimationDelay = Math.Max(2, frameDelays[imageCounter]);
 							imageCollection[imageCounter].GifDisposeMethod = imageCounter == 0 ? GifDisposeMethod.None : GifDisposeMethod.Background;
 							imageCounter++;
 						}
@@ -227,13 +213,20 @@ namespace TwitchDownloaderCore
 							{
 								using (var fs = new FileStream($"{tempFolder}/dggEmotes/{item.prefix}.{fileType}", FileMode.OpenOrCreate))
 								{
-									s.Result.CopyTo(fs);
+									if (fileType == "gif")
+									{
+										s.Result.CopyTo(fs);
+									} else {
+										var img = new MagickImage(s.Result);
+										if (img.Width != (int)width) {
+											img.Crop((int)width, (int)height);
+										}
+										img.Write(fs);
+									}
 								}
 							}
 						}
 					}
-					Directory.Delete($"{tempFolder}/dggEmotes/temp-{item.prefix}/", true);
-					fileType = dur != 0 ? "gif" : fileType;
 					doneCount++;
                     int percent = (int)(doneCount / (double)DGGEmotes.Count * 100);
 					progress.Report(new ProgressReport(ReportType.NewLineStatus, $"Converting dgg emotes: {percent}%"));
