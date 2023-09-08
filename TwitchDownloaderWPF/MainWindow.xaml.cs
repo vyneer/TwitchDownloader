@@ -1,4 +1,4 @@
-using AutoUpdaterDotNET;
+﻿using AutoUpdaterDotNET;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -67,7 +67,7 @@ namespace TwitchDownloaderWPF
                 }
             }
 
-            Version currentVersion = new Version("0.1.0");
+            Version currentVersion = new Version("0.1.1");
             Title = $"DGG Downloader v{currentVersion}";
 // #if !DEBUG
 //             if (AppContext.BaseDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))

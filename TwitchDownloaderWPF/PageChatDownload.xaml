@@ -10,7 +10,7 @@
       xmlns:fa="http://schemas.fontawesome.com/icons/"
       xmlns:lex="http://wpflocalizeextension.codeplex.com"
       lex:LocalizeDictionary.DesignCulture=""
-      lex:ResxLocalizationProvider.DefaultAssembly="TwitchDownloaderWPF"
+      lex:ResxLocalizationProvider.DefaultAssembly="DGGDownloaderWPF"
       lex:ResxLocalizationProvider.DefaultDictionary="Strings"
       xmlns:local="clr-namespace:TwitchDownloaderWPF"
       mc:Ignorable="d"

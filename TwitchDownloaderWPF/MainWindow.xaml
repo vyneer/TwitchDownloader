@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TwitchDownloaderWPF"
         xmlns:lex="http://wpflocalizeextension.codeplex.com"
         lex:LocalizeDictionary.DesignCulture=""
-        lex:ResxLocalizationProvider.DefaultAssembly="TwitchDownloaderWPF"
+        lex:ResxLocalizationProvider.DefaultAssembly="DGGDownloaderWPF"
         lex:ResxLocalizationProvider.DefaultDictionary="Strings"
         mc:Ignorable="d"
         Title="DGG Downloader" MinHeight="440" Height="500" MinWidth="700" Width="850" Loaded="Window_Loaded">
