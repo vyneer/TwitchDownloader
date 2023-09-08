@@ -251,7 +251,10 @@ namespace TwitchDownloaderWPF
 
         public void SaveSettings()
         {
-            Settings.Default.Font = comboFont.SelectedItem.ToString();
+            if (comboFont.SelectedItem != null)
+            {
+                Settings.Default.Font = comboFont.SelectedItem.ToString();
+            }
             Settings.Default.Outline = (bool)checkOutline.IsChecked;
             Settings.Default.Timestamp = (bool)checkTimestamp.IsChecked;
             Settings.Default.BackgroundColorR = colorBackground.SelectedColor.Value.R;
