@@ -1,4 +1,4 @@
-﻿using AutoUpdaterDotNET;
+using AutoUpdaterDotNET;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -69,14 +69,14 @@ namespace TwitchDownloaderWPF
 
             Version currentVersion = new Version("0.1.0");
             Title = $"DGG Downloader v{currentVersion}";
-#if !DEBUG
-            if (AppContext.BaseDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-            {
-                // If the app is in user profile, the updater probably doesn't need administrator permissions
-                AutoUpdater.RunUpdateAsAdmin = false;
-            }
-            AutoUpdater.Start("https://downloader-update.twitcharchives.workers.dev");
-#endif
+// #if !DEBUG
+//             if (AppContext.BaseDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+//             {
+//                 // If the app is in user profile, the updater probably doesn't need administrator permissions
+//                 AutoUpdater.RunUpdateAsAdmin = false;
+//             }
+//             AutoUpdater.Start("https://downloader-update.twitcharchives.workers.dev");
+// #endif
         }
     }
 }
