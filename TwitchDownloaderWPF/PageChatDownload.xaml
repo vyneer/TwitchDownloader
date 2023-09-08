@@ -99,7 +99,6 @@
                     </Style>
                 </RichTextBox.Resources>
             </RichTextBox>
-            <Button x:Name="clearEmotes" Margin="0,10,0,0" Height="40" Width="120" Content="{lex:Loc ClearEmotes}" Click="ClearEmotesButton_Click" Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource ActionButtonText}" BorderBrush="{DynamicResource AccentBrush}" />
         </StackPanel>
         <!--STATUS BAR-->
         <StatusBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="6" Background="{DynamicResource StatusBarBackground}" BorderBrush="{DynamicResource StatusBarBorder}">

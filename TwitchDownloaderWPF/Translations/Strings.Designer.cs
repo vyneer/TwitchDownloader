@@ -394,15 +394,6 @@ namespace TwitchDownloaderWPF.Translations {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clear Emote Cache.
-        /// </summary>
-        public static string ClearEmotes {
-            get {
-                return ResourceManager.GetString("ClearEmotes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Clip Download.
         /// </summary>
         public static string ClipDownload {

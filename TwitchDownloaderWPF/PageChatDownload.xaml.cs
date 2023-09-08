@@ -23,7 +23,6 @@ using WpfAnimatedGif;
 using YoutubeDLSharp;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace TwitchDownloaderWPF
 {
@@ -331,26 +330,6 @@ namespace TwitchDownloaderWPF
                 _cancellationTokenSource.Cancel();
             }
             catch (ObjectDisposedException) { }
-        }
-
-        private void ClearEmotesButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var emoteFolder = Path.Combine(
-                        Path.GetTempPath(),
-                        Path.Combine("DGGDownloader", "dggEmotes"));
-
-                if (Directory.Exists(emoteFolder))
-                {
-                    Directory.Delete(emoteFolder, true);
-                    AppendLog($"Cleared dgg emote folder - {emoteFolder}");
-                } else
-                {
-                    AppendLog($"No dgg emote folder found - {emoteFolder}");
-                }
-            } catch { }
-
         }
     }
 }
