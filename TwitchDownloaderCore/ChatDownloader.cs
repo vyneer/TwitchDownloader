@@ -152,6 +152,7 @@ namespace TwitchDownloaderCore
                 flairs = flairs.OrderBy(i => i.priority).ToList();
                 message.user_color = flairs.Count > 0 ? flairs[0].color : "#dcdcdc";
                 message.user_color = message.user_color == "" ? "#dcdcdc" : message.user_color;
+                message.rainbow_color = flairs.Count > 0 && flairs[0].rainbowColor;
                 message.comboCount = oldComment.comboCount;
                 newComment.message = message;
 

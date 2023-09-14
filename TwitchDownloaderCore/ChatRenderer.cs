@@ -73,8 +73,8 @@ namespace TwitchDownloaderCore
             }
             FloorCommentOffsets(chatRoot.comments);
 
-            outlinePaint = new SKPaint() { Style = SKPaintStyle.Stroke, StrokeWidth = (float)(renderOptions.OutlineSize * renderOptions.ReferenceScale), StrokeJoin = SKStrokeJoin.Round, Color = SKColors.Black, IsAntialias = true, IsAutohinted = true, LcdRenderText = true, SubpixelText = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High };
-            outlinePaint.MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 1.6f);
+            outlinePaint = new SKPaint() { Style = SKPaintStyle.Stroke, StrokeWidth = (float)(1.3 * renderOptions.OutlineSize * renderOptions.ReferenceScale), StrokeJoin = SKStrokeJoin.Round, Color = SKColors.Black, IsAntialias = true, IsAutohinted = true, LcdRenderText = true, SubpixelText = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High };
+            // outlinePaint.MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 1.0f);
             nameFont = new SKPaint() { LcdRenderText = true, SubpixelText = true, TextSize = (float)renderOptions.FontSize, IsAntialias = true, IsAutohinted = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High };
             messageFont = new SKPaint() { LcdRenderText = true, SubpixelText = true, TextSize = (float)renderOptions.FontSize, IsAntialias = true, IsAutohinted = true, HintingLevel = SKPaintHinting.Full, FilterQuality = SKFilterQuality.High, Color = renderOptions.MessageColor };
 
@@ -450,19 +450,28 @@ namespace TwitchDownloaderCore
                     {
                         if (emote.FrameCount > 1)
                         {
-                            int frameIndex = emote.EmoteFrameDurations.Count - 1;
-                            long imageFrame = currentTickMs % (emote.EmoteFrameDurations.Sum() * 10);
-                            for (int i = 0; i < emote.EmoteFrameDurations.Count; i++)
+                            if (!emote.Played)
                             {
-                                if (imageFrame - emote.EmoteFrameDurations[i] * 10 <= 0)
+                                int frameIndex = emote.LastFrameIndex;
+                                emote.LastTick = emote.LastTick == 0 ? currentTickMs : emote.LastTick;
+                                if (currentTickMs - emote.LastTick > emote.EmoteFrameDurations[frameIndex] * 10)
                                 {
-                                    frameIndex = i;
-                                    break;
+                                    emote.LastTick += emote.EmoteFrameDurations[frameIndex] * 10;
+                                    frameIndex++;
+                                    emote.LastFrameIndex = frameIndex;
                                 }
-                                imageFrame -= emote.EmoteFrameDurations[i] * 10;
+
+                                emote.PlayedFrames[frameIndex] = true;
+                                frameCanvas.DrawBitmap(emote.EmoteFrames[frameIndex], drawPoint.X, drawPoint.Y + frameHeight);
+                                if (emote.PlayedFrames.Count == emote.EmoteFrames.Count)
+                                {
+                                    emote.Played = true;
+                                }
                             }
-                            
-                            frameCanvas.DrawBitmap(emote.EmoteFrames[frameIndex], drawPoint.X, drawPoint.Y + frameHeight);
+                            else
+                            {
+                                frameCanvas.DrawBitmap(emote.EmoteFrames[emote.EmoteFrameDurations.Count - 1], drawPoint.X, drawPoint.Y + frameHeight);
+                            }
                         }
                     }
                 }
@@ -816,7 +825,7 @@ namespace TwitchDownloaderCore
                 emotePoint.X = drawPos.X - renderOptions.EmoteSpacing - twitchEmote.Width;
             }
             emotePoint.Y = (int)(sectionImages.Sum(x => x.Height) - renderOptions.SectionHeight + ((renderOptions.SectionHeight - twitchEmote.Height) / 2.0));
-            emotePositionList.Add((emotePoint, twitchEmote));
+            emotePositionList.Add((emotePoint, twitchEmote.Clone() as TwitchEmote));
         }
 
         private void DrawEmojiMessage(List<SKBitmap> sectionImages, List<(Point, TwitchEmote)> emotePositionList, ref Point drawPos, Point defaultPos, int bitsCount, string fragmentString, bool highlightWords)
@@ -1028,7 +1037,7 @@ namespace TwitchDownloaderCore
                             X = drawPos.X,
                             Y = (int)(sectionImages.Sum(x => x.Height) - renderOptions.SectionHeight + ((renderOptions.SectionHeight - twitchEmote.Height) / 2.0))
                         };
-                        emotePositionList.Add((emotePoint, twitchEmote));
+                        emotePositionList.Add((emotePoint, twitchEmote.Clone() as TwitchEmote));
                         drawPos.X += twitchEmote.Width + renderOptions.EmoteSpacing;
                         bitsPrinted = true;
                     }
@@ -1064,7 +1073,7 @@ namespace TwitchDownloaderCore
                     canvas.DrawRect(drawPos.X, 0, twitchEmote.Width + renderOptions.EmoteSpacing, renderOptions.SectionHeight, new SKPaint() { Color = SKColor.Parse(PURPLE) });
                 }
 
-                emotePositionList.Add((emotePoint, twitchEmote));
+                emotePositionList.Add((emotePoint, twitchEmote.Clone() as TwitchEmote));
                 drawPos.X += twitchEmote.Width + renderOptions.EmoteSpacing;
             }
             else
@@ -1074,10 +1083,28 @@ namespace TwitchDownloaderCore
             }
         }
 
-        private void DrawText(string drawText, SKPaint textFont, bool padding, List<SKBitmap> sectionImages, ref Point drawPos, Point defaultPos, bool highlightWords, bool noWrap = false)
+        private void DrawText(string drawText, SKPaint textFont, bool padding, List<SKBitmap> sectionImages, ref Point drawPos, Point defaultPos, bool highlightWords, bool noWrap = false, bool rainbowText = false)
         {
             bool isRtl = IsRightToLeft(drawText);
             float textWidth = MeasureText(drawText, textFont, isRtl);
+            
+            if (rainbowText)
+            {
+                SKColor[] colors = new SKColor[8];
+
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    colors[i] = SKColor.FromHsl(i * 360f / (colors.Length - 1), 100, 50);
+                }
+
+                textFont.Shader = SKShader.CreateLinearGradient(
+                    new SKPoint(0, 0), 
+                    new SKPoint(textWidth, 0),
+                    colors,
+                    null,
+                    SKShaderTileMode.Repeat);
+            }
+
             int effectiveChatWidth = renderOptions.ChatWidth - renderOptions.SidePadding - defaultPos.X;
 
             while (!noWrap && textWidth > effectiveChatWidth)
@@ -1249,7 +1276,7 @@ namespace TwitchDownloaderCore
 
             userPaint.Color = userColor;
             string userName = comment.commenter.display_name + (appendColon ? ":" : "");
-            DrawText(userName, userPaint, true, sectionImages, ref drawPos, defaultPos, false);
+            DrawText(userName, userPaint, true, sectionImages, ref drawPos, defaultPos, false, false, comment.message.rainbow_color);
             userPaint.Dispose();
         }
 

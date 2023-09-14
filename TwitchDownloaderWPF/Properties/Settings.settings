@@ -96,7 +96,7 @@
       <Value Profile="(Default)">[]</Value>
     </Setting>
     <Setting Name="EmoteScale" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">0.7</Value>
     </Setting>
     <Setting Name="GuiTheme" Type="System.String" Scope="User">
       <Value Profile="(Default)">System</Value>
@@ -126,10 +126,10 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="VerticalSpacingScale" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">0.4</Value>
     </Setting>
     <Setting Name="EmojiScale" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">0.7</Value>
     </Setting>
     <Setting Name="LeftSpacingScale" Type="System.Double" Scope="User">
       <Value Profile="(Default)">1</Value>

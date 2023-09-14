@@ -90,6 +90,7 @@ namespace TwitchDownloaderCore.TwitchObjects
 		public List<Fragment> fragments { get; set; }
 		public string[] user_badges { get; set; }
 		public string user_color { get; set; }
+		public bool rainbow_color { get; set; }
 
 		public Message Clone()
 		{
@@ -100,6 +101,7 @@ namespace TwitchDownloaderCore.TwitchObjects
 				fragments = new List<Fragment>(fragments.Capacity),
 				user_badges = user_badges,
 				user_color = user_color,
+				rainbow_color = rainbow_color,
 			};
 			for (int i = 0; i < fragments.Count; i++)
 			{

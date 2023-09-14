@@ -6,7 +6,10 @@ using System.Net;
 using System.Windows;
 using TwitchDownloaderWPF.Properties;
 using Xabe.FFmpeg.Downloader;
+using Newtonsoft.Json.Linq;
 using static TwitchDownloaderWPF.App;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace TwitchDownloaderWPF
 {
@@ -69,14 +72,32 @@ namespace TwitchDownloaderWPF
 
             Version currentVersion = new Version("0.1.2");
             Title = $"DGG Downloader v{currentVersion}";
-// #if !DEBUG
-//             if (AppContext.BaseDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-//             {
-//                 // If the app is in user profile, the updater probably doesn't need administrator permissions
-//                 AutoUpdater.RunUpdateAsAdmin = false;
-//             }
-//             AutoUpdater.Start("https://downloader-update.twitcharchives.workers.dev");
-// #endif
+#if !DEBUG
+            if (AppContext.BaseDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                // If the app is in user profile, the updater probably doesn't need administrator permissions
+                AutoUpdater.RunUpdateAsAdmin = false;
+            }
+            AutoUpdater.HttpUserAgent = "AutoUpdater";
+            AutoUpdater.InstalledVersion = currentVersion;
+            AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
+            AutoUpdater.Start("https://api.github.com/repos/vyneer/TwitchDownloader/releases/latest");
+#endif
+        }
+
+        private void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args)
+        {
+            var windowsRegex = new Regex(@"DGGDownloaderGUI-Debug-\d\.\d\.\d-Windows-x64", RegexOptions.IgnoreCase);
+            JObject json = JObject.Parse(args.RemoteData);
+            var assets = json["assets"].Value<JArray>();
+            List<dynamic> lst = assets.ToObject<List<dynamic>>();
+            var correct = lst.Find(a => windowsRegex.IsMatch((string)a["name"]));
+            args.UpdateInfo = new UpdateInfoEventArgs
+            {
+                CurrentVersion = json["tag_name"].Value<string>(),
+                ChangelogURL = json["html_url"].Value<string>(),
+                DownloadURL = correct.browser_download_url,
+            };
         }
     }
 }

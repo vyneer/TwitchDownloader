@@ -13,7 +13,7 @@ namespace TwitchDownloaderCore.TwitchObjects
         FirstParty,
         ThirdParty
     }
-    public class TwitchEmote
+    public class TwitchEmote : ICloneable
     {
         public SKCodec Codec { get; set; }
         public byte[] ImageData { get; set; }
@@ -35,8 +35,15 @@ namespace TwitchDownloaderCore.TwitchObjects
                     return Codec.FrameCount;
             }
         }
+        public Dictionary<int, bool> PlayedFrames { get; set; } = new Dictionary<int, bool>();
+        public bool Played { get; set; }
+
+        public int LastFrameIndex { get; set; }
+        public long LastTick { get; set; }
         public int Height { get { return EmoteFrames[0].Height; } }
         public int Width { get { return EmoteFrames[0].Width; } }
+
+        public TwitchEmote() {}
 
         public TwitchEmote(byte[] imageData, EmoteProvider emoteProvider, int imageScale, string imageId, string imageName)
         {
@@ -105,6 +112,27 @@ namespace TwitchDownloaderCore.TwitchObjects
                 EmoteFrames[i].Dispose();
                 EmoteFrames[i] = newBitmap;
             }
+        }
+
+        public object Clone() {
+            var clonedEmote = new TwitchEmote() {
+                Codec = Codec,
+                EmoteProvider = EmoteProvider,
+                Id = Id,
+                Name = Name,
+                ImageScale = ImageScale,
+                ImageData = ImageData,
+                EmoteFrameDurations = EmoteFrameDurations,
+                EmoteFrames = EmoteFrames,
+                TotalDuration = TotalDuration,
+                IsZeroWidth = IsZeroWidth,
+                PlayedFrames = new Dictionary<int, bool>(PlayedFrames),
+                Played = Played,
+                LastTick = LastTick,
+                LastFrameIndex = LastFrameIndex,
+            };
+
+            return clonedEmote;
         }
     }
 }

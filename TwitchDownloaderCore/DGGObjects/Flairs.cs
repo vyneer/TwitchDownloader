@@ -11,5 +11,6 @@ namespace TwitchDownloaderCore.DGGObjects
 		public bool hidden { get; set; }
 		public int priority { get; set; }
 		public string color { get; set; }
+		public bool rainbowColor { get; set; }
 	}
 }
