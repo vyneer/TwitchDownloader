@@ -776,7 +776,7 @@
     <value>Stream URL:</value>
   </data>
   <data name="EmoteFormat" xml:space="preserve">
-    <value>Emote Format</value>
+    <value>Emote Format:</value>
   </data>
   <data name="EmoteFormatGif" xml:space="preserve">
     <value>.gif</value>

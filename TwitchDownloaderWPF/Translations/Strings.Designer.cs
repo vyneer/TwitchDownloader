@@ -637,7 +637,7 @@ namespace TwitchDownloaderWPF.Translations {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Emote Format.
+        ///   Looks up a localized string similar to Emote Format:.
         /// </summary>
         public static string EmoteFormat {
             get {
