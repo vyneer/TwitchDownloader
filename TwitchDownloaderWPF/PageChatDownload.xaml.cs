@@ -302,7 +302,7 @@ namespace TwitchDownloaderWPF
                 {
                     statusMessage.Text = Translations.Strings.StatusError;
                     SetImage("Images/peepoSad.png", false);
-                    AppendLog(Translations.Strings.ErrorLog + ex.Message);
+                    AppendLog(Translations.Strings.ErrorLog + ex.Message + ex.StackTrace);
                     if (Settings.Default.VerboseErrors)
                     {
                         MessageBox.Show(ex.ToString(), Translations.Strings.VerboseErrorOutput, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -318,7 +318,7 @@ namespace TwitchDownloaderWPF
             }
             catch (Exception ex)
             {
-                AppendLog(Translations.Strings.ErrorLog + ex.Message);
+                AppendLog(Translations.Strings.ErrorLog + ex.Message + ex.StackTrace);
             }
         }
 
