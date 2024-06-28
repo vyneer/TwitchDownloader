@@ -91,9 +91,11 @@ namespace TwitchDownloaderCore
 											const iterArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), null).getPropertyValue('animation-iteration-count').split(',');
 											const dur = durArray.reduce((acc, cur, index) => {{
 												if (iterArray.length === durArray.length) {{
-													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[index]));
+                                                    const iAi = (iterArray[index] === 'infinite') ? 1 : iterArray[index];
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iAi));
 												}} else if (iterArray.length === 1) {{
-													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[0]));
+                                                    const iAi = (iterArray[0] === 'infinite') ? 1 : iterArray[0];
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iAi));
 												}} else {{
 													return acc + (parseFloat(cur.slice(0, -1)));
 												}}
@@ -106,9 +108,11 @@ namespace TwitchDownloaderCore
 											const iterArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::before').getPropertyValue('animation-iteration-count').split(',');
 											const dur = durArray.reduce((acc, cur, index) => {{
 												if (iterArray.length === durArray.length) {{
-													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[index]));
+                                                    const iAi = (iterArray[index] === 'infinite') ? 1 : iterArray[index];
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iAi));
 												}} else if (iterArray.length === 1) {{
-													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[0]));
+                                                    const iAi = (iterArray[0] === 'infinite') ? 1 : iterArray[0];
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iAi));
 												}} else {{
 													return acc + (parseFloat(cur.slice(0, -1)));
 												}}
@@ -121,9 +125,11 @@ namespace TwitchDownloaderCore
 											const iterArray = window.getComputedStyle(document.querySelector('.{item.prefix}'), '::after').getPropertyValue('animation-iteration-count').split(',');
 											const dur = durArray.reduce((acc, cur, index) => {{
 												if (iterArray.length === durArray.length) {{
-													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[index]));
+                                                    const iAi = (iterArray[index] === 'infinite') ? 1 : iterArray[index];
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iAi));
 												}} else if (iterArray.length === 1) {{
-													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iterArray[0]));
+                                                    const iAi = (iterArray[0] === 'infinite') ? 1 : iterArray[0];
+													return acc + (parseFloat(cur.slice(0, -1)) * parseFloat(iAi));
 												}} else {{
 													return acc + (parseFloat(cur.slice(0, -1)));
 												}}
@@ -136,6 +142,11 @@ namespace TwitchDownloaderCore
                         var backgroundPosition = await page.EvaluateExpressionAsync<bool>($@"(() => {{
           									return window.getComputedStyle(document.querySelector('.{item.prefix}')).getPropertyValue('background-position').split(' ')[0] !== '0%' 
         								}})()");
+
+                        if (dur < 0)
+                        {
+                            dur = 0;
+                        }
 
                         if (dur != 0)
                         {
